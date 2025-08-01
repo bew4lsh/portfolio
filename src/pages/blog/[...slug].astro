@@ -1,0 +1,257 @@
+---
+import { type CollectionEntry, getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ContactCTA from '../../components/ContactCTA.astro';
+import Hero from '../../components/Hero.astro';
+import Icon from '../../components/Icon.astro';
+import Pill from '../../components/Pill.astro';
+
+interface Props {
+	entry: CollectionEntry<'blog'>;
+}
+
+// This is a dynamic route that generates a page for every Markdown file in src/content/blog/
+export async function getStaticPaths() {
+	const posts = await getCollection('blog');
+	return posts.map((entry) => ({
+		params: { slug: entry.slug }, props: { entry },
+	}));
+}
+
+const { entry } = Astro.props;
+const { Content } = await entry.render();
+---
+
+<BaseLayout title={entry.data.title} description={entry.data.description}>
+	<div class="stack gap-20">
+		<div class="stack gap-15">
+			<header>
+				<div class="wrapper stack gap-2">
+					<a class="back-link" href="/blog/">
+						<Icon icon="arrow-left" /> Blog
+					</a>
+					<Hero title={entry.data.title} align="start">
+						<div class="details">
+							<div class="tags">
+								{entry.data.tags.map((t) => <Pill>{t}</Pill>)}
+							</div>
+							<div class="post-meta">
+								<time datetime={entry.data.publishDate.toISOString()}>
+									{entry.data.publishDate.toLocaleDateString('en-US', {
+										year: 'numeric',
+										month: 'long',
+										day: 'numeric',
+									})}
+								</time>
+								{entry.data.updatedDate && (
+									<span class="updated">
+										Updated: {entry.data.updatedDate.toLocaleDateString('en-US', {
+											year: 'numeric',
+											month: 'long',
+											day: 'numeric',
+										})}
+									</span>
+								)}
+								{entry.data.category && (
+									<span class="category">{entry.data.category}</span>
+								)}
+							</div>
+							<p class="description">{entry.data.description}</p>
+						</div>
+					</Hero>
+				</div>
+			</header>
+			<main class="wrapper">
+				<div class="stack gap-10 content">
+					{entry.data.img && (
+						<img
+							src={entry.data.img}
+							alt={entry.data.img_alt || ''}
+							class="hero-image"
+						/>
+					)}
+					<div class="content">
+						<Content />
+					</div>
+				</div>
+			</main>
+		</div>
+		<ContactCTA />
+	</div>
+</BaseLayout>
+
+<style>
+	header {
+		padding-bottom: 2.5rem;
+		border-bottom: 1px solid var(--gray-800);
+	}
+
+	.back-link {
+		display: none;
+	}
+
+	.back-link svg {
+		width: 1rem;
+		height: 1rem;
+	}
+
+	.details {
+		display: flex;
+		flex-direction: column;
+		padding: 0.5rem;
+		gap: 1.5rem;
+		justify-content: space-between;
+		align-items: center;
+	}
+
+	.tags {
+		display: flex;
+		gap: 0.5rem;
+		flex-wrap: wrap;
+	}
+
+	.post-meta {
+		display: flex;
+		gap: 1rem;
+		flex-wrap: wrap;
+		align-items: center;
+		font-size: var(--text-sm);
+		color: var(--gray-400);
+	}
+
+	.updated {
+		font-style: italic;
+	}
+
+	.category {
+		background: var(--accent-regular);
+		color: var(--accent-text-over);
+		padding: 0.25rem 0.5rem;
+		border-radius: 0.25rem;
+		font-size: var(--text-xs);
+	}
+
+	.description {
+		font-size: var(--text-lg);
+		max-width: 54ch;
+	}
+
+	.hero-image {
+		width: 100%;
+		max-height: 400px;
+		object-fit: cover;
+		border-radius: 1rem;
+		box-shadow: var(--shadow-sm);
+	}
+
+	.content {
+		max-width: 65ch;
+		margin-inline: auto;
+	}
+
+	.content > :global(* + *) {
+		margin-top: 1rem;
+	}
+
+	.content :global(h1),
+	.content :global(h2),
+	.content :global(h3),
+	.content :global(h4),
+	.content :global(h5) {
+		margin: 1.5rem 0 0.5rem;
+		color: var(--accent-text-over);
+	}
+
+	.content :global(img) {
+		border-radius: 1rem;
+		box-shadow: var(--shadow-sm);
+		background: var(--gradient-subtle);
+		border: 1px solid var(--gray-800);
+		max-width: 100%;
+		height: auto;
+	}
+
+	.content :global(blockquote) {
+		font-size: var(--text-lg);
+		font-family: var(--font-brand);
+		font-weight: 600;
+		line-height: 1.1;
+		padding-inline-start: 1.5rem;
+		border-inline-start: 0.25rem solid var(--accent-dark);
+		color: var(--gray-0);
+	}
+
+	.content :global(a) {
+		color: var(--accent-regular);
+	}
+
+	.content :global(a:hover),
+	.content :global(a:focus) {
+		color: var(--accent-text-over);
+	}
+
+	/* Code blocks */
+	.content :global(pre) {
+		padding: 1.5rem;
+		border-radius: 0.75rem;
+		border: 1px solid var(--gray-800);
+		overflow-x: auto;
+		background-color: var(--gray-999-basis);
+	}
+
+	.content :global(code) {
+		font-family: var(--font-mono);
+		font-size: var(--text-sm);
+	}
+
+	.content :global(:not(pre) > code) {
+		background: var(--gray-800);
+		color: var(--accent-text-over);
+		padding: 0.125em 0.375em;
+		border-radius: 0.25rem;
+		font-size: 0.875em;
+	}
+
+	/* Tables */
+	.content :global(table) {
+		width: 100%;
+		border-collapse: collapse;
+		margin: 1.5rem 0;
+		border-radius: 0.5rem;
+		overflow: hidden;
+		border: 1px solid var(--gray-800);
+	}
+
+	.content :global(th),
+	.content :global(td) {
+		padding: 0.75rem;
+		text-align: left;
+		border-bottom: 1px solid var(--gray-800);
+	}
+
+	.content :global(th) {
+		background: var(--gray-900);
+		font-weight: 600;
+		color: var(--accent-text-over);
+	}
+
+	.content :global(tr:hover) {
+		background: var(--gray-900);
+	}
+
+	@media (min-width: 50em) {
+		.back-link {
+			display: block;
+			align-self: flex-start;
+		}
+
+		.details {
+			flex-direction: row;
+			gap: 2.5rem;
+		}
+
+		.content :global(blockquote) {
+			font-size: var(--text-2xl);
+		}
+	}
+</style>
