@@ -1,0 +1,47 @@
+---
+interface Props {
+	src: string;
+	alt: string;
+	width?: number;
+	height?: number;
+	loading?: 'lazy' | 'eager';
+	class?: string;
+	sizes?: string;
+}
+
+const { 
+	src, 
+	alt, 
+	width, 
+	height, 
+	loading = 'lazy', 
+	class: className = '',
+	sizes = '(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw'
+} = Astro.props;
+
+// Ensure alt text is provided for accessibility
+if (!alt) {
+	console.warn(`Missing alt text for image: ${src}`);
+}
+
+// Generate optimized image attributes
+const imageAttrs = {
+	src,
+	alt: alt || 'Image',
+	loading,
+	decoding: 'async' as const,
+	...(width && { width }),
+	...(height && { height }),
+	...(className && { class: className }),
+};
+---
+
+<img {...imageAttrs} />
+
+<style>
+	img {
+		max-width: 100%;
+		height: auto;
+		display: block;
+	}
+</style>

@@ -8,12 +8,28 @@ import Hero from '../components/Hero.astro';
 import Icon from '../components/Icon.astro';
 import Pill from '../components/Pill.astro';
 
-const posts = (await getCollection('blog'))
-	.filter(post => !post.data.draft)
-	.sort((a, b) => new Date(b.data.publishDate).valueOf() - new Date(a.data.publishDate).valueOf());
+// Load and process blog posts with error handling
+let posts: Array<any> = [];
+let featuredPosts: Array<any> = [];
+let regularPosts: Array<any> = [];
 
-const featuredPosts = posts.filter(post => post.data.featured);
-const regularPosts = posts.filter(post => !post.data.featured);
+try {
+	const allPosts = await getCollection('blog');
+	
+	posts = allPosts
+		.filter(post => post?.data && !post.data.draft && post.data.publishDate) // Ensure valid data
+		.sort((a, b) => {
+			const dateA = new Date(a.data.publishDate);
+			const dateB = new Date(b.data.publishDate);
+			return dateB.valueOf() - dateA.valueOf();
+		});
+
+	featuredPosts = posts.filter(post => post.data.featured);
+	regularPosts = posts.filter(post => !post.data.featured);
+} catch (error) {
+	console.error('Error loading blog posts:', error);
+	// Posts arrays remain empty, but site won't crash
+}
 ---
 
 <BaseLayout

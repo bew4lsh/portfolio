@@ -6,26 +6,34 @@ interface Props {
 	project: CollectionEntry<'work'>;
 }
 
-const { data, id } = Astro.props.project;
+const { data, id, slug } = Astro.props.project;
+
+// Ensure required fields exist with fallbacks
+const title = data.title || 'Untitled Project';
+const description = data.description || 'No description available';
+const img = data.img || '/assets/placeholder.jpg';
+const imgAlt = data.img_alt || `Screenshot of ${title}`;
+const tools = data.tools || [];
+const featured = data.featured || false;
 ---
 
-<a class="card" href={`/work/${id}`}>
+<a class="card" href={`/work/${slug}`}>
 	<div class="content">
-		<span class="title">{data.title}</span>
-		<p class="description">{data.description}</p>
-		{data.tools && (
+		<span class="title">{title}</span>
+		<p class="description">{description}</p>
+		{tools.length > 0 && (
 			<div class="tools">
-				{data.tools.slice(0, 3).map((tool) => (
+				{tools.slice(0, 3).map((tool) => (
 					<Pill size="small">{tool}</Pill>
 				))}
-				{data.tools.length > 3 && (
-					<span class="more">+{data.tools.length - 3} more</span>
+				{tools.length > 3 && (
+					<span class="more">+{tools.length - 3} more</span>
 				)}
 			</div>
 		)}
-		{data.featured && <span class="featured-badge">Featured</span>}
+		{featured && <span class="featured-badge">Featured</span>}
 	</div>
-	<img src={data.img} alt={data.img_alt || ''} loading="lazy" decoding="async" />
+	<img src={img} alt={imgAlt} loading="lazy" decoding="async" />
 </a>
 
 <style>

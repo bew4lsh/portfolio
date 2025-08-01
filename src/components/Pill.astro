@@ -1,12 +1,15 @@
 ---
+import type { PillSize } from '../types/content';
+
 interface Props {
-	size?: 'small' | 'medium';
+	size?: PillSize;
+	class?: string;
 }
 
-const { size = 'medium' } = Astro.props;
+const { size = 'medium', class: className = '' } = Astro.props;
 ---
 
-<div class={`pill ${size}`}><slot /></div>
+<div class={`pill ${size} ${className}`}><slot /></div>
 
 <style>
 	.pill {

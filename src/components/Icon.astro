@@ -1,9 +1,10 @@
 ---
 import type { HTMLAttributes } from 'astro/types';
 import { iconPaths } from './IconPaths';
+import type { IconName } from '../types/content';
 
 interface Props {
-	icon: keyof typeof iconPaths;
+	icon: IconName;
 	color?: string;
 	gradient?: boolean;
 	size?: string;
@@ -11,6 +12,11 @@ interface Props {
 
 const { color = 'currentcolor', gradient, icon, size } = Astro.props;
 const iconPath = iconPaths[icon];
+
+// Error handling for missing icons
+if (!iconPath) {
+	console.warn(`Icon "${icon}" not found in iconPaths`);
+}
 
 const attrs: HTMLAttributes<'svg'> = {};
 if (size) attrs.style = { '--size': size };
