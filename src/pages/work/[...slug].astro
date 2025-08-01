@@ -38,6 +38,36 @@ const { Content } = await render(entry);
 								{entry.data.tags.map((t) => <Pill>{t}</Pill>)}
 							</div>
 							<p class="description">{entry.data.description}</p>
+							{(entry.data.github || entry.data.demo || entry.data.tools) && (
+								<div class="project-meta">
+									{entry.data.tools && (
+										<div class="tools">
+											<strong>Technologies:</strong>
+											<div class="tool-pills">
+												{entry.data.tools.map((tool) => (
+													<Pill size="small">{tool}</Pill>
+												))}
+											</div>
+										</div>
+									)}
+									{(entry.data.github || entry.data.demo) && (
+										<div class="links">
+											{entry.data.github && (
+												<a href={entry.data.github} class="project-link" target="_blank" rel="noopener noreferrer">
+													<Icon icon="github-logo" size="1.2em" />
+													View Code
+												</a>
+											)}
+											{entry.data.demo && (
+												<a href={entry.data.demo} class="project-link demo" target="_blank" rel="noopener noreferrer">
+													<Icon icon="external-link" size="1.2em" />
+													Live Demo
+												</a>
+											)}
+										</div>
+									)}
+								</div>
+							)}
 						</div>
 					</Hero>
 				</div>
@@ -82,6 +112,70 @@ const { Content } = await render(entry);
 	.description {
 		font-size: var(--text-lg);
 		max-width: 54ch;
+	}
+
+	.project-meta {
+		display: flex;
+		flex-direction: column;
+		gap: 1.5rem;
+		width: 100%;
+		max-width: 54ch;
+	}
+
+	.tools {
+		display: flex;
+		flex-direction: column;
+		gap: 0.75rem;
+	}
+
+	.tools strong {
+		color: var(--gray-0);
+		font-size: var(--text-sm);
+	}
+
+	.tool-pills {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+	}
+
+	.links {
+		display: flex;
+		gap: 1rem;
+		flex-wrap: wrap;
+	}
+
+	.project-link {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		padding: 0.75rem 1.5rem;
+		background: var(--gray-999);
+		border: 1px solid var(--gray-800);
+		border-radius: 0.5rem;
+		color: var(--gray-200);
+		text-decoration: none;
+		font-size: var(--text-sm);
+		font-weight: 500;
+		transition: all var(--theme-transition);
+	}
+
+	.project-link:hover {
+		background: var(--gray-800);
+		border-color: var(--accent-regular);
+		color: var(--gray-0);
+		transform: translateY(-1px);
+	}
+
+	.project-link.demo {
+		background: var(--accent-regular);
+		border-color: var(--accent-regular);
+		color: var(--accent-text-over);
+	}
+
+	.project-link.demo:hover {
+		background: var(--accent-dark);
+		border-color: var(--accent-dark);
 	}
 
 	.content {
