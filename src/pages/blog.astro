@@ -53,7 +53,7 @@ try {
 					<div class="gallery">
 						{featuredPosts.map((post) => (
 							<article class="post-card">
-								<a href={`/blog/${post.id.replace('.md', '')}/`}>
+								<a href={`${import.meta.env.BASE_URL}blog/${post.id.replace('.md', '')}/`}>
 									{post.data.img && (
 										<img
 											src={post.data.img}
@@ -96,7 +96,7 @@ try {
 				<div class="gallery">
 					{regularPosts.map((post) => (
 						<article class="post-card">
-							<a href={`/blog/${post.id.replace('.md', '')}/`}>
+							<a href={`${import.meta.env.BASE_URL}blog/${post.id.replace('.md', '')}/`}>
 								{post.data.img && (
 									<img
 										src={post.data.img}
