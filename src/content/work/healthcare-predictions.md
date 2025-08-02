@@ -11,8 +11,6 @@ tags:
   - Healthcare Analytics
   - Python
 featured: false
-github: "https://github.com/bew4lsh/healthcare-predictions"
-demo: "https://healthcare-model-demo.herokuapp.com"
 tools:
   - Python
   - Scikit-learn

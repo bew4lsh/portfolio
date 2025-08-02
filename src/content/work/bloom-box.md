@@ -10,9 +10,7 @@ tags:
   - Analytics
   - Visualization
   - Business Intelligence
-featured: true
-github: "https://github.com/bew4lsh/ecommerce-analytics"
-demo: "https://ecommerce-dashboard-demo.streamlit.app"
+featured: false
 tools:
   - Python
   - Pandas

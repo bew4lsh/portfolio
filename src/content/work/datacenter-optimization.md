@@ -4,8 +4,8 @@ publishDate: 2024-06-15 00:00:00
 img: /assets/stock-2.jpg
 img_alt: Datacenter visualization showing server utilization metrics and optimization recommendations
 description: |
-  Comprehensive analysis of datacenter operations resulting in 23% cost reduction and 40% 
-  improved resource utilization through data-driven optimization strategies and predictive analytics.
+  Interactive data analysis showcasing comprehensive datacenter optimization resulting in 23% cost reduction and 40% 
+  improved resource utilization through data-driven strategies. Features live Plotly.js visualizations and real-world business impact metrics.
 tags:
   - Data Analysis
   - Infrastructure
@@ -13,7 +13,6 @@ tags:
   - Cost Optimization
 featured: true
 hasCharts: true
-github: "https://github.com/bew4lsh/datacenter-optimization"
 demo: "/work/datacenter-optimization"
 tools:
   - Python
