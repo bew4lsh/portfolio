@@ -16,6 +16,7 @@ export const collections = {
 			github: z.string().optional(),
 			demo: z.string().optional(),
 			tools: z.array(z.string()).optional(),
+			hasCharts: z.boolean().optional(),
 		}),
 	}),
 	blog: defineCollection({

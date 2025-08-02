@@ -5,6 +5,7 @@ import ContactCTA from '../../components/ContactCTA.astro';
 import Hero from '../../components/Hero.astro';
 import Icon from '../../components/Icon.astro';
 import Pill from '../../components/Pill.astro';
+import PlotlyChart from '../../components/PlotlyChart.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 
 interface Props {
@@ -24,6 +25,68 @@ export async function getStaticPaths() {
 
 const { entry } = Astro.props;
 const { Content } = await render(entry);
+
+// Chart data for datacenter optimization project
+const chartData = entry.id === 'datacenter-optimization' ? {
+  utilizationData: [
+    {
+      x: ['0-10%', '10-20%', '20-30%', '30-40%', '40-50%', '50-60%', '60-70%', '70-80%', '80-90%', '90-100%'],
+      y: [420, 680, 920, 1150, 480, 320, 240, 180, 85, 25],
+      type: 'bar',
+      name: 'Number of Servers',
+      marker: {
+        color: ['#E63946', '#E63946', '#E63946', '#F77F00', '#F77F00', '#06D6A0', '#06D6A0', '#2E86AB', '#2E86AB', '#2E86AB']
+      }
+    }
+  ],
+  utilizationLayout: {
+    title: 'Server CPU Utilization Distribution',
+    xaxis: { title: 'CPU Utilization Range' },
+    yaxis: { title: 'Number of Servers' },
+    showlegend: false
+  },
+  
+  costData: [
+    {
+      labels: ['Compute', 'Storage', 'Network', 'Power & Cooling', 'Software Licenses', 'Maintenance'],
+      values: [7200, 3600, 1800, 2400, 1800, 1200],
+      type: 'pie',
+      hole: 0.4,
+      marker: {
+        colors: ['#2E86AB', '#A23B72', '#F77F00', '#06D6A0', '#E63946', '#7209B7']
+      }
+    }
+  ],
+  costLayout: {
+    title: 'Monthly Infrastructure Costs ($000s)',
+    showlegend: true
+  },
+  
+  performanceCostData: [
+    {
+      x: [45, 67, 78, 82, 91, 85, 73, 69, 88, 76, 94, 81, 72, 89, 77, 83, 90, 75, 87, 79],
+      y: [120, 180, 220, 340, 520, 380, 240, 190, 480, 260, 680, 350, 210, 510, 250, 360, 590, 230, 470, 280],
+      mode: 'markers',
+      type: 'scatter',
+      name: 'Applications',
+      marker: {
+        size: [12, 15, 18, 25, 35, 28, 20, 16, 32, 22, 45, 27, 19, 33, 21, 26, 38, 20, 31, 24],
+        color: [85, 72, 68, 91, 94, 88, 76, 73, 92, 79, 96, 84, 71, 93, 78, 86, 95, 75, 90, 81],
+        colorscale: 'RdYlGn',
+        showscale: true,
+        colorbar: {
+          title: 'Efficiency Score'
+        }
+      }
+    }
+  ],
+  performanceCostLayout: {
+    title: 'Application Performance vs Infrastructure Cost',
+    xaxis: { title: 'Performance Score (0-100)' },
+    yaxis: { title: 'Monthly Cost ($000s)' },
+    showlegend: false
+  }
+} : null;
 ---
 
 <BaseLayout title={entry.data.title} description={entry.data.description}>
@@ -78,6 +141,32 @@ const { Content } = await render(entry);
 					<div class="content">
 						<Content />
 					</div>
+					
+					{/* Render charts for datacenter optimization project */}
+					{chartData && (
+						<div class="charts-section">
+							<PlotlyChart 
+								id="utilization-analysis"
+								data={chartData.utilizationData}
+								layout={chartData.utilizationLayout}
+								height="450px"
+							/>
+							
+							<PlotlyChart 
+								id="cost-analysis"
+								data={chartData.costData}
+								layout={chartData.costLayout}
+								height="400px"
+							/>
+							
+							<PlotlyChart 
+								id="performance-cost"
+								data={chartData.performanceCostData}
+								layout={chartData.performanceCostLayout}
+								height="500px"
+							/>
+						</div>
+					)}
 				</div>
 			</main>
 		</div>
@@ -210,6 +299,35 @@ const { Content } = await render(entry);
 		padding-inline-start: 1.5rem;
 		border-inline-start: 0.25rem solid var(--accent-dark);
 		color: var(--gray-0);
+	}
+	
+	.charts-section {
+		margin-top: 3rem;
+		display: flex;
+		flex-direction: column;
+		gap: 2rem;
+		max-width: none;
+	}
+	
+	.content :global(.chart-container) {
+		margin: 2rem 0;
+		padding: 1.5rem;
+		background: var(--gray-999);
+		border: 1px solid var(--gray-800);
+		border-radius: 0.75rem;
+	}
+	
+	.content :global(.chart-container h4) {
+		color: var(--accent-text-over);
+		margin-bottom: 0.5rem;
+		font-size: var(--text-lg);
+	}
+	
+	.content :global(.chart-description) {
+		color: var(--gray-400);
+		font-size: var(--text-sm);
+		margin-bottom: 1rem;
+		font-style: italic;
 	}
 
 	.back-link,

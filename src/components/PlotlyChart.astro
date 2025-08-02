@@ -1,0 +1,186 @@
+---
+interface Props {
+  id: string;
+  data: any[];
+  layout?: any;
+  config?: any;
+  height?: string;
+  width?: string;
+  className?: string;
+}
+
+const { 
+  id, 
+  data, 
+  layout = {}, 
+  config = { responsive: true, displayModeBar: 'hover' },
+  height = '400px',
+  width = '100%',
+  className = ''
+} = Astro.props;
+
+// Default layout settings that work well with the portfolio theme
+const defaultLayout = {
+  paper_bgcolor: 'transparent',
+  plot_bgcolor: 'transparent',
+  font: {
+    family: 'Public Sans, system-ui, sans-serif',
+    color: 'var(--gray-200)'
+  },
+  margin: {
+    l: 60,
+    r: 40,
+    t: 60,
+    b: 60
+  },
+  ...layout
+};
+---
+
+<div 
+  id={id}
+  class={`plotly-chart ${className}`}
+  style={`height: ${height}; width: ${width}; min-height: ${height};`}
+  data-plotly-data={JSON.stringify(data)}
+  data-plotly-layout={JSON.stringify(defaultLayout)}
+  data-plotly-config={JSON.stringify(config)}
+>
+  <!-- Loading skeleton -->
+  <div class="chart-loading">
+    <div class="loading-skeleton">
+      <div class="skeleton-title"></div>
+      <div class="skeleton-chart"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Plotly chart initialization
+  function initializePlotlyChart(container) {
+    try {
+      const data = JSON.parse(container.dataset.plotlyData);
+      const layout = JSON.parse(container.dataset.plotlyLayout);
+      const config = JSON.parse(container.dataset.plotlyConfig);
+      
+      // Remove loading skeleton
+      const loadingEl = container.querySelector('.chart-loading');
+      if (loadingEl) {
+        loadingEl.remove();
+      }
+      
+      // Create the plot
+      window.Plotly.newPlot(container, data, layout, config);
+      
+      // Handle theme changes
+      const handleThemeChange = () => {
+        const isDark = document.documentElement.classList.contains('theme-dark');
+        const updatedLayout = {
+          ...layout,
+          font: {
+            ...layout.font,
+            color: isDark ? '#a3acc8' : '#3d4663'
+          }
+        };
+        window.Plotly.relayout(container, updatedLayout);
+      };
+      
+      // Watch for theme changes
+      const observer = new MutationObserver(handleThemeChange);
+      observer.observe(document.documentElement, { 
+        attributes: true, 
+        attributeFilter: ['class'] 
+      });
+      
+    } catch (error) {
+      console.error('Failed to initialize Plotly chart:', error);
+      container.innerHTML = '<div class="chart-error">Failed to load chart</div>';
+    }
+  }
+  
+  // Initialize all charts when page loads
+  document.addEventListener('DOMContentLoaded', () => {
+    const charts = document.querySelectorAll('.plotly-chart');
+    charts.forEach(chart => {
+      // Use intersection observer for performance
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            initializePlotlyChart(entry.target);
+            observer.unobserve(entry.target);
+          }
+        });
+      }, {
+        rootMargin: '50px'
+      });
+      
+      observer.observe(chart);
+    });
+  });
+</script>
+
+<style>
+  .plotly-chart {
+    background: var(--gray-999);
+    border-radius: 0.75rem;
+    border: 1px solid var(--gray-800);
+    overflow: hidden;
+    position: relative;
+  }
+  
+  .chart-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    width: 100%;
+  }
+  
+  .loading-skeleton {
+    width: 90%;
+    height: 90%;
+    padding: 1rem;
+  }
+  
+  .skeleton-title {
+    height: 24px;
+    background: linear-gradient(90deg, var(--gray-800) 25%, var(--gray-700) 50%, var(--gray-800) 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+    width: 60%;
+  }
+  
+  .skeleton-chart {
+    height: calc(100% - 40px);
+    background: linear-gradient(90deg, var(--gray-800) 25%, var(--gray-700) 50%, var(--gray-800) 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
+    border-radius: 8px;
+  }
+  
+  @keyframes loading {
+    0% {
+      background-position: 200% 0;
+    }
+    100% {
+      background-position: -200% 0;
+    }
+  }
+  
+  .chart-error {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: var(--gray-400);
+    font-style: italic;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 50em) {
+    .plotly-chart {
+      border-radius: 0.5rem;
+    }
+  }
+</style>
