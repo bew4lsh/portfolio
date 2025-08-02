@@ -1,5 +1,5 @@
 ---
-import { type CollectionEntry, getCollection } from 'astro:content';
+import { type CollectionEntry, getCollection, render } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import ContactCTA from '../../components/ContactCTA.astro';
 import Hero from '../../components/Hero.astro';
@@ -17,7 +17,7 @@ export async function getStaticPaths() {
 		return posts
 			.filter(entry => !entry.data.draft) // Filter out draft posts
 			.map((entry) => ({
-				params: { slug: entry.slug }, 
+				params: { slug: entry.id.replace('.md', '') }, // Use id for the slug
 				props: { entry },
 			}));
 	} catch (error) {
@@ -33,7 +33,7 @@ if (!entry || !entry.data) {
 	throw new Error('Blog post data is missing');
 }
 
-const { Content } = await entry.render();
+const { Content } = await render(entry);
 
 // Ensure required fields exist with fallbacks
 const title = entry.data.title || 'Untitled Post';
