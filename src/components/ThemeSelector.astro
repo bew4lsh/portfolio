@@ -1,0 +1,325 @@
+---
+import { loadThemes } from '../utils/themeLoader';
+import Icon from './Icon.astro';
+
+const themes = await loadThemes();
+---
+
+<div class="theme-selector">
+  <button class="theme-toggle" id="theme-toggle" aria-label="Change color theme">
+    <Icon icon="strategy" size="1.2em" />
+    <span class="sr-only">Change Theme</span>
+  </button>
+  
+  <div class="theme-menu" id="theme-menu">
+    <div class="theme-menu-header">
+      <h3>Color Themes</h3>
+    </div>
+    <div class="theme-options">
+      {themes.map(theme => (
+        <button 
+          class="theme-option"
+          data-theme={theme.id}
+          data-theme-name={theme.name}
+          title={theme.description}
+        >
+          <div class="theme-preview">
+            <div 
+              class="color-swatch primary" 
+              style={`background-color: ${theme.colors.accent.regular}`}
+            ></div>
+            <div 
+              class="color-swatch secondary" 
+              style={`background-color: ${theme.colors.accent.light}`}
+            ></div>
+            <div 
+              class="color-swatch tertiary" 
+              style={`background-color: ${theme.colors.accent.dark}`}
+            ></div>
+          </div>
+          <div class="theme-info">
+            <span class="theme-name">{theme.name}</span>
+            {theme.author && theme.author !== 'Portfolio' && (
+              <span class="theme-author">by {theme.author}</span>
+            )}
+          </div>
+          <div class="theme-check" data-theme-id={theme.id}>
+            ✓
+          </div>
+        </button>
+      ))}
+    </div>
+  </div>
+</div>
+
+<script>
+  // Client-side theme utilities (avoid importing server-only modules)
+  function getCurrentTheme() {
+    if (typeof document === 'undefined') return 'default';
+    
+    // Check for theme class on document element
+    const classList = document.documentElement.classList;
+    for (const className of classList) {
+      if (className.startsWith('theme-')) {
+        return className.replace('theme-', '');
+      }
+    }
+    
+    return 'default';
+  }
+
+  function applyTheme(themeId) {
+    if (typeof document === 'undefined') return;
+    
+    // Remove existing theme classes
+    const classList = document.documentElement.classList;
+    const existingThemes = Array.from(classList).filter(cls => cls.startsWith('theme-'));
+    existingThemes.forEach(theme => classList.remove(theme));
+    
+    // Add new theme class
+    classList.add(`theme-${themeId}`);
+    
+    // Save to localStorage
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem('selected-theme', themeId);
+    }
+    
+    // Dispatch custom event for components to listen to
+    document.dispatchEvent(new CustomEvent('theme-changed', { 
+      detail: { themeId } 
+    }));
+  }
+
+  function getStoredTheme() {
+    if (typeof localStorage === 'undefined') return 'default';
+    return localStorage.getItem('selected-theme') || 'default';
+  }
+  
+  class ThemeSelector {
+    constructor() {
+      this.toggle = document.getElementById('theme-toggle');
+      this.menu = document.getElementById('theme-menu');
+      this.isOpen = false;
+      
+      this.init();
+    }
+    
+    init() {
+      if (!this.toggle || !this.menu) return;
+      
+      // Set initial active theme
+      this.updateActiveTheme();
+      
+      // Toggle menu
+      this.toggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.toggleMenu();
+      });
+      
+      // Theme selection
+      this.menu.addEventListener('click', (e) => {
+        const option = e.target.closest('.theme-option');
+        if (option) {
+          const themeId = option.dataset.theme;
+          this.selectTheme(themeId);
+          this.closeMenu();
+        }
+      });
+      
+      // Close menu when clicking outside
+      document.addEventListener('click', (e) => {
+        if (!this.menu.contains(e.target)) {
+          this.closeMenu();
+        }
+      });
+      
+      // Listen for theme changes from other sources
+      document.addEventListener('theme-changed', () => {
+        this.updateActiveTheme();
+      });
+      
+      // Apply stored theme on page load
+      const storedTheme = getStoredTheme();
+      if (storedTheme !== 'default') {
+        applyTheme(storedTheme);
+      }
+    }
+    
+    toggleMenu() {
+      this.isOpen = !this.isOpen;
+      this.menu.classList.toggle('open', this.isOpen);
+      this.toggle.setAttribute('aria-expanded', this.isOpen.toString());
+    }
+    
+    closeMenu() {
+      this.isOpen = false;
+      this.menu.classList.remove('open');
+      this.toggle.setAttribute('aria-expanded', 'false');
+    }
+    
+    selectTheme(themeId) {
+      applyTheme(themeId);
+      this.updateActiveTheme();
+    }
+    
+    updateActiveTheme() {
+      const currentTheme = getCurrentTheme();
+      
+      // Update visual indicators
+      const options = this.menu.querySelectorAll('.theme-option');
+      options.forEach(option => {
+        const isActive = option.dataset.theme === currentTheme;
+        option.classList.toggle('active', isActive);
+        
+        const check = option.querySelector('.theme-check');
+        if (check) {
+          check.style.opacity = isActive ? '1' : '0';
+        }
+      });
+    }
+  }
+  
+  // Initialize when DOM is ready
+  document.addEventListener('DOMContentLoaded', () => {
+    new ThemeSelector();
+  });
+</script>
+
+<style>
+  .theme-selector {
+    position: relative;
+    display: inline-block;
+  }
+  
+  .theme-toggle {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    background: var(--gray-999);
+    border: 1px solid var(--gray-800);
+    border-radius: 0.5rem;
+    color: var(--gray-200);
+    cursor: pointer;
+    transition: all var(--theme-transition);
+  }
+  
+  .theme-toggle:hover {
+    background: var(--gray-800);
+    border-color: var(--accent-regular);
+    color: var(--gray-0);
+  }
+  
+  .theme-menu {
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    right: 0;
+    min-width: 280px;
+    background: var(--gray-999);
+    border: 1px solid var(--gray-800);
+    border-radius: 0.75rem;
+    box-shadow: var(--shadow-md);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.2s ease;
+    z-index: 1000;
+  }
+  
+  .theme-menu.open {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+  
+  .theme-menu-header {
+    padding: 1rem 1rem 0.5rem;
+    border-bottom: 1px solid var(--gray-800);
+  }
+  
+  .theme-menu-header h3 {
+    margin: 0;
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--gray-100);
+  }
+  
+  .theme-options {
+    padding: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  
+  .theme-option {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: all var(--theme-transition);
+    width: 100%;
+    text-align: left;
+  }
+  
+  .theme-option:hover {
+    background: var(--gray-800);
+    border-color: var(--gray-700);
+  }
+  
+  .theme-option.active {
+    background: var(--accent-overlay);
+    border-color: var(--accent-regular);
+  }
+  
+  .theme-preview {
+    display: flex;
+    gap: 0.25rem;
+    flex-shrink: 0;
+  }
+  
+  .color-swatch {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 1px solid var(--gray-700);
+  }
+  
+  .theme-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+  }
+  
+  .theme-name {
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--gray-100);
+  }
+  
+  .theme-author {
+    font-size: var(--text-xs);
+    color: var(--gray-400);
+    font-style: italic;
+  }
+  
+  .theme-check {
+    flex-shrink: 0;
+    color: var(--accent-regular);
+    opacity: 0;
+    transition: opacity var(--theme-transition);
+  }
+  
+  /* Mobile adjustments */
+  @media (max-width: 50em) {
+    .theme-menu {
+      right: -0.5rem;
+      left: -0.5rem;
+      min-width: auto;
+    }
+  }
+</style>

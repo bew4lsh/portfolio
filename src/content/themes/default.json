@@ -1,0 +1,18 @@
+{
+  "name": "Portfolio Purple",
+  "id": "default",
+  "description": "Original portfolio theme with elegant purple accents",
+  "author": "Portfolio Default",
+  "colors": {
+    "accent": {
+      "light": "#c561f6",
+      "regular": "#7611a6",
+      "dark": "#1c0056"
+    },
+    "charts": {
+      "primary": ["#7611a6", "#c561f6", "#1c0056", "#9d4edd", "#5a189a"],
+      "categorical": ["#7611a6", "#2E86AB", "#F77F00", "#06D6A0", "#E63946"],
+      "gradient": ["#1c0056", "#7611a6", "#c561f6"]
+    }
+  }
+}

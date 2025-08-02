@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import ThemeStyles from './ThemeStyles.astro';
 
 interface Props {
 	title?: string | undefined;
@@ -32,6 +33,8 @@ const {
 	rel="stylesheet"
 />
 
+<ThemeStyles />
+
 <!-- Plotly.js for interactive charts -->
 <script src="https://cdn.plot.ly/plotly-2.24.1.min.js"></script>
 <script is:inline>
@@ -44,6 +47,16 @@ const {
 	};
 	const isDark = getThemePreference() === 'dark';
 	document.documentElement.classList[isDark ? 'add' : 'remove']('theme-dark');
+	
+	// Apply stored color theme
+	const getColorTheme = () => {
+		if (typeof localStorage !== 'undefined' && localStorage.getItem('selected-theme')) {
+			return localStorage.getItem('selected-theme');
+		}
+		return 'default';
+	};
+	const colorTheme = getColorTheme();
+	document.documentElement.classList.add(`theme-${colorTheme}`);
 
 	if (typeof localStorage !== 'undefined') {
 		// Watch the document element and persist user preference when it changes.

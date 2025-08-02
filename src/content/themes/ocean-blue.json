@@ -1,0 +1,18 @@
+{
+  "name": "Ocean Blue",
+  "id": "ocean-blue", 
+  "description": "Professional blue theme inspired by ocean depths",
+  "author": "Portfolio",
+  "colors": {
+    "accent": {
+      "light": "#4fc3f7",
+      "regular": "#2196f3",
+      "dark": "#0d47a1"
+    },
+    "charts": {
+      "primary": ["#2196f3", "#4fc3f7", "#0d47a1", "#90caf9", "#1976d2"],
+      "categorical": ["#2196f3", "#4caf50", "#ff9800", "#e91e63", "#9c27b0"],
+      "gradient": ["#0d47a1", "#2196f3", "#4fc3f7"]
+    }
+  }
+}

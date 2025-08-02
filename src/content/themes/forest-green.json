@@ -1,0 +1,18 @@
+{
+  "name": "Forest Green",
+  "id": "forest-green",
+  "description": "Natural green theme with earthy tones for sustainability-focused content",
+  "author": "Portfolio",
+  "colors": {
+    "accent": {
+      "light": "#81c784",
+      "regular": "#4caf50", 
+      "dark": "#1b5e20"
+    },
+    "charts": {
+      "primary": ["#4caf50", "#81c784", "#1b5e20", "#a5d6a7", "#388e3c"],
+      "categorical": ["#4caf50", "#2196f3", "#ff9800", "#e91e63", "#795548"],
+      "gradient": ["#1b5e20", "#4caf50", "#81c784"]
+    }
+  }
+}

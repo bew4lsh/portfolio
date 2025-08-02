@@ -55,12 +55,77 @@ const defaultLayout = {
 </div>
 
 <script>
+  // Get current theme colors from CSS variables
+  function getThemeColors() {
+    const style = getComputedStyle(document.documentElement);
+    return {
+      accent: style.getPropertyValue('--accent-regular').trim(),
+      accentLight: style.getPropertyValue('--accent-light').trim(),
+      accentDark: style.getPropertyValue('--accent-dark').trim(),
+      chartColors: [
+        style.getPropertyValue('--chart-categorical-1').trim(),
+        style.getPropertyValue('--chart-categorical-2').trim(),
+        style.getPropertyValue('--chart-categorical-3').trim(),
+        style.getPropertyValue('--chart-categorical-4').trim(),
+        style.getPropertyValue('--chart-categorical-5').trim(),
+        style.getPropertyValue('--chart-categorical-6').trim(),
+        style.getPropertyValue('--chart-categorical-7').trim(),
+        style.getPropertyValue('--chart-categorical-8').trim()
+      ].filter(color => color && color !== '')
+    };
+  }
+  
+  // Apply theme colors to chart data
+  function applyThemeToChartData(data) {
+    const themeColors = getThemeColors();
+    
+    return data.map((trace, index) => {
+      const updatedTrace = { ...trace };
+      
+      // Apply categorical colors for multiple traces
+      if (data.length > 1 && themeColors.chartColors.length > 0) {
+        const colorIndex = index % themeColors.chartColors.length;
+        if (trace.type === 'bar' || trace.type === 'scatter') {
+          updatedTrace.marker = {
+            ...trace.marker,
+            color: trace.marker?.color || themeColors.chartColors[colorIndex]
+          };
+        } else if (trace.type === 'scatter' && trace.mode?.includes('lines')) {
+          updatedTrace.line = {
+            ...trace.line,
+            color: trace.line?.color || themeColors.chartColors[colorIndex]
+          };
+        }
+      }
+      
+      // For single traces, use accent color
+      if (data.length === 1) {
+        if (trace.type === 'bar' && !trace.marker?.color) {
+          updatedTrace.marker = {
+            ...trace.marker,
+            color: themeColors.accent
+          };
+        } else if (trace.type === 'scatter' && trace.mode?.includes('lines') && !trace.line?.color) {
+          updatedTrace.line = {
+            ...trace.line,
+            color: themeColors.accent
+          };
+        }
+      }
+      
+      return updatedTrace;
+    });
+  }
+
   // Plotly chart initialization
   function initializePlotlyChart(container) {
     try {
-      const data = JSON.parse(container.dataset.plotlyData);
+      let data = JSON.parse(container.dataset.plotlyData);
       const layout = JSON.parse(container.dataset.plotlyLayout);
       const config = JSON.parse(container.dataset.plotlyConfig);
+      
+      // Apply theme colors to chart data
+      data = applyThemeToChartData(data);
       
       // Remove loading skeleton
       const loadingEl = container.querySelector('.chart-loading');
@@ -71,7 +136,7 @@ const defaultLayout = {
       // Create the plot
       window.Plotly.newPlot(container, data, layout, config);
       
-      // Handle theme changes
+      // Handle theme changes (both dark/light and color themes)
       const handleThemeChange = () => {
         const isDark = document.documentElement.classList.contains('theme-dark');
         const updatedLayout = {
@@ -81,7 +146,12 @@ const defaultLayout = {
             color: isDark ? '#a3acc8' : '#3d4663'
           }
         };
-        window.Plotly.relayout(container, updatedLayout);
+        
+        // Re-apply theme colors to chart data
+        const newData = applyThemeToChartData(JSON.parse(container.dataset.plotlyData));
+        
+        // Update both layout and data
+        window.Plotly.react(container, newData, updatedLayout, config);
       };
       
       // Watch for theme changes
@@ -90,6 +160,9 @@ const defaultLayout = {
         attributes: true, 
         attributeFilter: ['class'] 
       });
+      
+      // Listen for custom theme change events
+      document.addEventListener('theme-changed', handleThemeChange);
       
     } catch (error) {
       console.error('Failed to initialize Plotly chart:', error);

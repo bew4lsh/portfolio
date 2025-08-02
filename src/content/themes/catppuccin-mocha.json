@@ -1,0 +1,18 @@
+{
+  "name": "Catppuccin Mocha", 
+  "id": "catppuccin-mocha",
+  "description": "Rich dark theme with vibrant colors from the Catppuccin palette",
+  "author": "Catppuccin",
+  "colors": {
+    "accent": {
+      "light": "#f9e2af",
+      "regular": "#cba6f7",
+      "dark": "#b4befe"
+    },
+    "charts": {
+      "primary": ["#cba6f7", "#f9e2af", "#fab387", "#a6e3a1", "#94e2d5"],
+      "categorical": ["#cba6f7", "#f9e2af", "#fab387", "#a6e3a1", "#94e2d5", "#b4befe", "#f5c2e7", "#89dceb"],
+      "gradient": ["#b4befe", "#cba6f7", "#f9e2af"]
+    }
+  }
+}

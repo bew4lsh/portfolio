@@ -1,0 +1,18 @@
+{
+  "name": "Catppuccin Latte",
+  "id": "catppuccin-latte",
+  "description": "Warm light theme with soothing pastel colors from the Catppuccin palette",
+  "author": "Catppuccin",
+  "colors": {
+    "accent": {
+      "light": "#fe640b",
+      "regular": "#d20f39",
+      "dark": "#8839ef"
+    },
+    "charts": {
+      "primary": ["#d20f39", "#fe640b", "#df8e1d", "#40a02b", "#209fb5"],
+      "categorical": ["#d20f39", "#fe640b", "#df8e1d", "#40a02b", "#209fb5", "#8839ef", "#ea76cb", "#179299"],
+      "gradient": ["#8839ef", "#d20f39", "#fe640b"]
+    }
+  }
+}

@@ -35,4 +35,25 @@ export const collections = {
 			category: z.string().optional(),
 		}),
 	}),
+	themes: defineCollection({
+		loader: glob({ base: './src/content/themes', pattern: '**/*.json' }),
+		schema: z.object({
+			name: z.string(),
+			id: z.string(),
+			description: z.string(),
+			author: z.string().optional(),
+			colors: z.object({
+				accent: z.object({
+					light: z.string(),
+					regular: z.string(),
+					dark: z.string()
+				}),
+				charts: z.object({
+					primary: z.array(z.string()),
+					categorical: z.array(z.string()),
+					gradient: z.array(z.string())
+				})
+			})
+		})
+	})
 };

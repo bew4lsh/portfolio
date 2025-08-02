@@ -1,0 +1,29 @@
+---
+import { loadThemes, generateThemeCSS } from '../utils/themeLoader';
+
+const themes = await loadThemes();
+---
+
+{/* Generate CSS for each theme */}
+{themes.map(theme => (
+  <style is:global set:html={generateThemeCSS(theme)} />
+))}
+
+<style is:global>
+  /* Theme transition animations */
+  :root {
+    --theme-transition: 0.2s ease-in-out;
+  }
+  
+  * {
+    transition: 
+      background-color var(--theme-transition),
+      border-color var(--theme-transition),
+      color var(--theme-transition);
+  }
+  
+  /* Chart-specific theme variables for smooth transitions */
+  .plotly-chart {
+    transition: all var(--theme-transition);
+  }
+</style>

@@ -2,6 +2,7 @@
 import Icon from './Icon.astro';
 import type { iconPaths } from './IconPaths';
 import ThemeToggle from './ThemeToggle.astro';
+import ThemeSelector from './ThemeSelector.astro';
 
 // Get the base URL from Astro config and ensure it ends with a slash
 const base = import.meta.env.BASE_URL.endsWith('/') ? import.meta.env.BASE_URL : import.meta.env.BASE_URL + '/';
@@ -99,7 +100,8 @@ const isCurrentPage = (href: string) => {
 				}
 			</div>
 
-			<div class="theme-toggle">
+			<div class="theme-controls">
+				<ThemeSelector />
 				<ThemeToggle />
 			</div>
 		</div>
@@ -262,9 +264,13 @@ const isCurrentPage = (href: string) => {
 		color: var(--accent-text-over);
 	}
 
-	.theme-toggle {
+	.theme-controls {
 		display: flex;
+		gap: 0.5rem;
 		align-items: center;
+	}
+	
+	.theme-controls :global(.theme-selector) {
 		height: calc(var(--icon-size) + 2 * var(--icon-padding));
 	}
 
