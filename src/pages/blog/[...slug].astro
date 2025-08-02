@@ -173,6 +173,8 @@ const imgAlt = entry.data.img_alt || `Cover image for ${title}`;
 	.content {
 		max-width: 65ch;
 		margin-inline: auto;
+		word-wrap: break-word;
+		overflow-wrap: break-word;
 	}
 
 	.content > :global(* + *) {
@@ -248,6 +250,21 @@ const imgAlt = entry.data.img_alt || `Cover image for ${title}`;
 		border: 1px solid var(--gray-800);
 	}
 
+	/* Responsive table wrapper */
+	.content :global(table) {
+		display: block;
+		overflow-x: auto;
+		white-space: nowrap;
+	}
+
+	@media (min-width: 50em) {
+		.content :global(table) {
+			display: table;
+			overflow-x: visible;
+			white-space: normal;
+		}
+	}
+
 	.content :global(th),
 	.content :global(td) {
 		padding: 0.75rem;
@@ -263,6 +280,27 @@ const imgAlt = entry.data.img_alt || `Cover image for ${title}`;
 
 	.content :global(tr:hover) {
 		background: var(--gray-900);
+	}
+
+	/* Mobile-specific adjustments */
+	@media (max-width: 50em) {
+		.content {
+			padding: 0 1rem;
+		}
+		
+		.content :global(pre) {
+			margin: 1rem -1rem;
+			border-radius: 0;
+		}
+		
+		.content :global(table) {
+			font-size: 0.875rem;
+		}
+		
+		.content :global(th),
+		.content :global(td) {
+			padding: 0.5rem 0.25rem;
+		}
 	}
 
 	@media (min-width: 50em) {
