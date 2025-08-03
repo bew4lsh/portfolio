@@ -78,9 +78,9 @@ function generateThemeCSS(theme) {
       --accent-text-over: ${accentTextOver};
       
       /* Theme-aware background gradients */
-      --bg-gradient-subtle: linear-gradient(135deg, ${theme.colors.accent.dark}15, transparent 50%, ${theme.colors.accent.light}08);
-      --bg-gradient-hero: radial-gradient(ellipse 60% 50% at 50% 0%, ${theme.colors.accent.light}12, transparent 60%);
-      --bg-gradient-footer: linear-gradient(180deg, ${theme.colors.accent.dark}08, ${theme.colors.accent.regular}15);
+      --bg-gradient-subtle: linear-gradient(135deg, ${theme.colors.accent.dark}30, transparent 50%, ${theme.colors.accent.light}20);
+      --bg-gradient-hero: radial-gradient(ellipse 60% 50% at 50% 0%, ${theme.colors.accent.light}25, transparent 60%);
+      --bg-gradient-footer: linear-gradient(180deg, ${theme.colors.accent.dark}20, ${theme.colors.accent.regular}30);
       
       /* Theme-aware image filters */
       --img-theme-filter: sepia(0.4) hue-rotate(${getThemeHueRotate(theme)}) saturate(1.2) brightness(1.05) contrast(1.1);
