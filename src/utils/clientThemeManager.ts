@@ -11,6 +11,7 @@ export class ThemeManager {
   private constructor() {
     if (typeof document !== 'undefined') {
       this.loadState();
+      this.initializePostRender();
     }
   }
   
@@ -22,27 +23,36 @@ export class ThemeManager {
   }
   
   private loadState(): void {
-    // Load dark mode preference
-    const darkPreference = this.getStoredDarkMode();
-    this.state.darkMode = darkPreference === 'dark';
+    // Sync with existing DOM state (set by inline script)
+    const docClass = document.documentElement.classList;
+    this.state.darkMode = docClass.contains('theme-dark');
     
-    // Load color theme preference  
-    this.state.colorTheme = this.getStoredColorTheme();
-    
-    this.applyState();
+    // Extract color theme from existing classes
+    const colorThemeClass = Array.from(docClass)
+      .find(cls => cls.startsWith('theme-') && cls !== 'theme-dark');
+    this.state.colorTheme = colorThemeClass ? 
+      colorThemeClass.replace('theme-', '') : 'default';
   }
   
-  private getStoredDarkMode(): string {
-    if (typeof localStorage === 'undefined') {
-      return window.matchMedia?.('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  private initializePostRender(): void {
+    // Set up persistence observer after initial load
+    if (typeof localStorage !== 'undefined') {
+      const observer = new MutationObserver(() => {
+        this.persistState();
+      });
+      observer.observe(document.documentElement, { 
+        attributes: true, 
+        attributeFilter: ['class'] 
+      });
     }
-    return localStorage.getItem('theme') || 
-      (window.matchMedia?.('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
   }
   
-  private getStoredColorTheme(): string {
-    if (typeof localStorage === 'undefined') return 'default';
-    return localStorage.getItem('selected-theme') || 'default';
+  private getStoredValue(key: string, fallback: string): string {
+    try {
+      return localStorage?.getItem(key) || fallback;
+    } catch {
+      return fallback;
+    }
   }
   
   private applyState(): void {
@@ -64,9 +74,14 @@ export class ThemeManager {
   }
   
   private persistState(): void {
-    if (typeof localStorage !== 'undefined') {
-      localStorage.setItem('theme', this.state.darkMode ? 'dark' : 'light');
-      localStorage.setItem('selected-theme', this.state.colorTheme);
+    try {
+      if (typeof localStorage !== 'undefined') {
+        localStorage.setItem('theme', this.state.darkMode ? 'dark' : 'light');
+        localStorage.setItem('selected-theme', this.state.colorTheme);
+      }
+    } catch (error) {
+      // Silently handle localStorage errors (e.g., storage quota exceeded, private browsing)
+      console.warn('Failed to persist theme preferences:', error);
     }
   }
   
@@ -84,8 +99,20 @@ export class ThemeManager {
   }
   
   public setColorTheme(themeId: string): void {
-    if (this.state.colorTheme !== themeId) {
-      this.state.colorTheme = themeId;
+    // Validate theme ID exists (basic validation)
+    if (!themeId || typeof themeId !== 'string') {
+      console.warn('Invalid theme ID provided:', themeId);
+      return;
+    }
+    
+    // Sanitize theme ID to prevent CSS injection
+    const sanitizedThemeId = themeId.replace(/[^a-zA-Z0-9-_]/g, '');
+    if (sanitizedThemeId !== themeId) {
+      console.warn('Theme ID sanitized from', themeId, 'to', sanitizedThemeId);
+    }
+    
+    if (this.state.colorTheme !== sanitizedThemeId) {
+      this.state.colorTheme = sanitizedThemeId;
       this.applyState();
       this.persistState();
       this.dispatchEvents();
@@ -112,6 +139,27 @@ export class ThemeManager {
   
   public isDarkMode(): boolean {
     return this.state.darkMode;
+  }
+}
+
+// Enhanced error handling utilities
+export function isLocalStorageAvailable(): boolean {
+  try {
+    const test = '__localStorage_test__';
+    localStorage.setItem(test, test);
+    localStorage.removeItem(test);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export function getThemeWithFallback(key: string, fallback: string): string {
+  try {
+    return localStorage?.getItem(key) || fallback;
+  } catch (error) {
+    console.warn(`Failed to access localStorage for key "${key}":`, error);
+    return fallback;
   }
 }
 

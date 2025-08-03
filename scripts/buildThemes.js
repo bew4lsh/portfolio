@@ -1,38 +1,18 @@
-import { getCollection } from 'astro:content';
-import type { CollectionEntry } from 'astro:content';
-import { validateTheme, type ValidationResult } from './themeValidator';
+#!/usr/bin/env node
 
-export type Theme = CollectionEntry<'themes'>['data'] & { id: string };
+// Build-time theme CSS generation script
+import { readFileSync, writeFileSync, readdirSync } from 'fs';
+import { join, dirname } from 'path';
+import { fileURLToPath } from 'url';
 
-export async function loadThemes(): Promise<Theme[]> {
-  const themes = await getCollection('themes');
-  return themes.map(theme => ({
-    ...theme.data,
-    id: theme.id
-  }));
-}
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const themesDir = join(__dirname, '../src/content/themes');
+const outputPath = join(__dirname, '../src/styles/themes.css');
 
-export async function loadValidatedThemes(): Promise<{ themes: Theme[]; validation: { [id: string]: ValidationResult } }> {
-  const themes = await loadThemes();
-  const validation: { [id: string]: ValidationResult } = {};
-  
-  // Validate each theme and log issues in development
-  themes.forEach(theme => {
-    const result = validateTheme(theme);
-    validation[theme.id] = result;
-    
-    // Log validation issues in development
-    if (import.meta.env.DEV && (!result.isValid || result.warnings.length > 0)) {
-      console.warn(`Theme validation for "${theme.id}":`, result);
-    }
-  });
-  
-  return { themes, validation };
-}
-
-export function generateThemeCSS(theme: Theme): string {
+// Simple theme CSS generation without full Astro environment
+function generateThemeCSS(theme) {
   // Helper function for safe circular color access with fallback
-  const getChartColor = (colors: string[], index: number, fallback = '#7611a6'): string => {
+  const getChartColor = (colors, index, fallback = '#7611a6') => {
     if (!colors || colors.length === 0) return fallback;
     return colors[index % colors.length] || fallback;
   };
@@ -82,29 +62,38 @@ export function generateThemeCSS(theme: Theme): string {
   `;
 }
 
-export function getThemeChartColors(theme: Theme) {
-  return {
-    primary: theme.colors.charts.primary,
-    categorical: theme.colors.charts.categorical,
-    gradient: theme.colors.charts.gradient,
-    // CSS variable references for dynamic use
-    primaryVars: [
-      'var(--chart-color-1)',
-      'var(--chart-color-2)', 
-      'var(--chart-color-3)',
-      'var(--chart-color-4)',
-      'var(--chart-color-5)'
-    ],
-    categoricalVars: [
-      'var(--chart-categorical-1)',
-      'var(--chart-categorical-2)',
-      'var(--chart-categorical-3)',
-      'var(--chart-categorical-4)',
-      'var(--chart-categorical-5)',
-      'var(--chart-categorical-6)',
-      'var(--chart-categorical-7)',
-      'var(--chart-categorical-8)'
-    ]
-  };
-}
+// Main generation function
+console.log('🎨 Generating consolidated theme CSS...\n');
 
+try {
+  const themeFiles = readdirSync(themesDir).filter(file => file.endsWith('.json'));
+  
+  let consolidatedCSS = `/* 
+ * Consolidated theme styles - Generated automatically
+ * This file combines all theme CSS variables for optimal performance
+ */
+
+`;
+
+  themeFiles.forEach(file => {
+    const filePath = join(themesDir, file);
+    const content = readFileSync(filePath, 'utf8');
+    const theme = JSON.parse(content);
+    
+    // Add theme ID from filename if not present
+    if (!theme.id) {
+      theme.id = file.replace('.json', '');
+    }
+    
+    consolidatedCSS += `/* ${theme.name} theme styles */`;
+    consolidatedCSS += generateThemeCSS(theme);
+    consolidatedCSS += '\n';
+  });
+
+  writeFileSync(outputPath, consolidatedCSS, 'utf8');
+  console.log('✅ Generated consolidated theme CSS at:', outputPath);
+
+} catch (error) {
+  console.error('❌ Failed to generate theme CSS:', error);
+  process.exit(1);
+}

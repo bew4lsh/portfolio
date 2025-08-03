@@ -44,28 +44,24 @@ export const collections = {
 			author: z.string().optional(),
 			colors: z.object({
 				accent: z.object({
-					light: z.string(),
-					regular: z.string(),
-					dark: z.string()
+					light: z.string().regex(/^#[0-9a-fA-F]{6}$/, 'Must be a valid hex color'),
+					regular: z.string().regex(/^#[0-9a-fA-F]{6}$/, 'Must be a valid hex color'),
+					dark: z.string().regex(/^#[0-9a-fA-F]{6}$/, 'Must be a valid hex color')
 				}),
-				gray: z.object({
-					'0': z.string(),
-					'50': z.string(),
-					'100': z.string(),
-					'200': z.string(),
-					'300': z.string(),
-					'400': z.string(),
-					'500': z.string(),
-					'600': z.string(),
-					'700': z.string(),
-					'800': z.string(),
-					'900': z.string(),
-					'999': z.string()
-				}).optional(),
+				gray: z.record(
+					z.enum(['0', '50', '100', '200', '300', '400', '500', '600', '700', '800', '900', '999']),
+					z.string().regex(/^#[0-9a-fA-F]{6}$/, 'Must be a valid hex color')
+				).optional(),
 				charts: z.object({
-					primary: z.array(z.string()),
-					categorical: z.array(z.string()),
-					gradient: z.array(z.string())
+					primary: z.array(z.string().regex(/^#[0-9a-fA-F]{6}$/, 'Must be a valid hex color'))
+						.min(1, 'Must have at least 1 primary color')
+						.max(10, 'Too many primary colors'),
+					categorical: z.array(z.string().regex(/^#[0-9a-fA-F]{6}$/, 'Must be a valid hex color'))
+						.min(1, 'Must have at least 1 categorical color')
+						.max(15, 'Too many categorical colors'),
+					gradient: z.array(z.string().regex(/^#[0-9a-fA-F]{6}$/, 'Must be a valid hex color'))
+						.min(2, 'Must have at least 2 gradient colors')
+						.max(5, 'Too many gradient colors')
 				})
 			})
 		})

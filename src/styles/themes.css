@@ -1,0 +1,187 @@
+/* 
+ * Consolidated theme styles - Generated automatically
+ * This file combines all theme CSS variables for optimal performance
+ */
+
+/* Catppuccin Latte theme styles */
+    :root.theme-catppuccin-latte {
+      --accent-light: #fe640b;
+      --accent-regular: #d20f39;
+      --accent-dark: #8839ef;
+      
+      --gray-0: #4c4f69;
+      --gray-50: #5c5f77;
+      --gray-100: #6c6f85;
+      --gray-200: #7c7f93;
+      --gray-300: #8c8fa1;
+      --gray-400: #9ca0b0;
+      --gray-500: #acb0be;
+      --gray-600: #bcc0cc;
+      --gray-700: #ccd0da;
+      --gray-800: #dce0e8;
+      --gray-900: #eff1f5;
+      --gray-999: #eff1f5;
+  
+      --chart-color-1: #d20f39;
+      --chart-color-2: #fe640b;
+      --chart-color-3: #df8e1d;
+      --chart-color-4: #40a02b;
+      --chart-color-5: #209fb5;
+      
+      --chart-categorical-1: #d20f39;
+      --chart-categorical-2: #fe640b;
+      --chart-categorical-3: #df8e1d;
+      --chart-categorical-4: #40a02b;
+      --chart-categorical-5: #209fb5;
+      --chart-categorical-6: #8839ef;
+      --chart-categorical-7: #ea76cb;
+      --chart-categorical-8: #179299;
+      
+      --gradient-stop-1: #8839ef;
+      --gradient-stop-2: #d20f39;
+      --gradient-stop-3: #fe640b;
+    }
+  
+/* Catppuccin Mocha theme styles */
+    :root.theme-catppuccin-mocha {
+      --accent-light: #f9e2af;
+      --accent-regular: #cba6f7;
+      --accent-dark: #b4befe;
+      
+      --gray-0: #cdd6f4;
+      --gray-50: #bac2de;
+      --gray-100: #a6adc8;
+      --gray-200: #9399b2;
+      --gray-300: #7f849c;
+      --gray-400: #6c7086;
+      --gray-500: #585b70;
+      --gray-600: #45475a;
+      --gray-700: #313244;
+      --gray-800: #1e1e2e;
+      --gray-900: #181825;
+      --gray-999: #11111b;
+  
+      --chart-color-1: #cba6f7;
+      --chart-color-2: #f9e2af;
+      --chart-color-3: #fab387;
+      --chart-color-4: #a6e3a1;
+      --chart-color-5: #94e2d5;
+      
+      --chart-categorical-1: #cba6f7;
+      --chart-categorical-2: #f9e2af;
+      --chart-categorical-3: #fab387;
+      --chart-categorical-4: #a6e3a1;
+      --chart-categorical-5: #94e2d5;
+      --chart-categorical-6: #b4befe;
+      --chart-categorical-7: #f5c2e7;
+      --chart-categorical-8: #89dceb;
+      
+      --gradient-stop-1: #b4befe;
+      --gradient-stop-2: #cba6f7;
+      --gradient-stop-3: #f9e2af;
+    }
+  
+/* Portfolio Purple theme styles */
+    :root.theme-default {
+      --accent-light: #c561f6;
+      --accent-regular: #7611a6;
+      --accent-dark: #1c0056;
+      
+      --chart-color-1: #7611a6;
+      --chart-color-2: #c561f6;
+      --chart-color-3: #1c0056;
+      --chart-color-4: #9d4edd;
+      --chart-color-5: #5a189a;
+      
+      --chart-categorical-1: #7611a6;
+      --chart-categorical-2: #2E86AB;
+      --chart-categorical-3: #F77F00;
+      --chart-categorical-4: #06D6A0;
+      --chart-categorical-5: #E63946;
+      --chart-categorical-6: #7611a6;
+      --chart-categorical-7: #2E86AB;
+      --chart-categorical-8: #F77F00;
+      
+      --gradient-stop-1: #1c0056;
+      --gradient-stop-2: #7611a6;
+      --gradient-stop-3: #c561f6;
+    }
+  
+/* Forest Green theme styles */
+    :root.theme-forest-green {
+      --accent-light: #81c784;
+      --accent-regular: #4caf50;
+      --accent-dark: #1b5e20;
+      
+      --gray-0: #3e2723;
+      --gray-50: #4e342e;
+      --gray-100: #5d4037;
+      --gray-200: #6d4c41;
+      --gray-300: #795548;
+      --gray-400: #8d6e63;
+      --gray-500: #a1887f;
+      --gray-600: #bcaaa4;
+      --gray-700: #d7ccc8;
+      --gray-800: #efebe9;
+      --gray-900: #f5f5f5;
+      --gray-999: #fafafa;
+  
+      --chart-color-1: #4caf50;
+      --chart-color-2: #81c784;
+      --chart-color-3: #1b5e20;
+      --chart-color-4: #a5d6a7;
+      --chart-color-5: #388e3c;
+      
+      --chart-categorical-1: #4caf50;
+      --chart-categorical-2: #2196f3;
+      --chart-categorical-3: #ff9800;
+      --chart-categorical-4: #e91e63;
+      --chart-categorical-5: #795548;
+      --chart-categorical-6: #4caf50;
+      --chart-categorical-7: #2196f3;
+      --chart-categorical-8: #ff9800;
+      
+      --gradient-stop-1: #1b5e20;
+      --gradient-stop-2: #4caf50;
+      --gradient-stop-3: #81c784;
+    }
+  
+/* Ocean Blue theme styles */
+    :root.theme-ocean-blue {
+      --accent-light: #4fc3f7;
+      --accent-regular: #2196f3;
+      --accent-dark: #0d47a1;
+      
+      --gray-0: #37474f;
+      --gray-50: #455a64;
+      --gray-100: #546e7a;
+      --gray-200: #607d8b;
+      --gray-300: #78909c;
+      --gray-400: #90a4ae;
+      --gray-500: #b0bec5;
+      --gray-600: #cfd8dc;
+      --gray-700: #eceff1;
+      --gray-800: #f5f5f5;
+      --gray-900: #fafafa;
+      --gray-999: #ffffff;
+  
+      --chart-color-1: #2196f3;
+      --chart-color-2: #4fc3f7;
+      --chart-color-3: #0d47a1;
+      --chart-color-4: #90caf9;
+      --chart-color-5: #1976d2;
+      
+      --chart-categorical-1: #2196f3;
+      --chart-categorical-2: #4caf50;
+      --chart-categorical-3: #ff9800;
+      --chart-categorical-4: #e91e63;
+      --chart-categorical-5: #9c27b0;
+      --chart-categorical-6: #2196f3;
+      --chart-categorical-7: #4caf50;
+      --chart-categorical-8: #ff9800;
+      
+      --gradient-stop-1: #0d47a1;
+      --gradient-stop-2: #2196f3;
+      --gradient-stop-3: #4fc3f7;
+    }
+  

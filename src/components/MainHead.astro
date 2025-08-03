@@ -1,6 +1,6 @@
 ---
 import '../styles/global.css';
-import ThemeStyles from './ThemeStyles.astro';
+import '../styles/themes.css';
 
 interface Props {
 	title?: string | undefined;
@@ -33,48 +33,53 @@ const {
 	rel="stylesheet"
 />
 
-<ThemeStyles />
 
-<!-- Plotly.js for interactive charts -->
-<script src="https://cdn.plot.ly/plotly-2.24.1.min.js"></script>
+<!-- Theme initialization - Critical path to prevent FOUC -->
 <script is:inline>
-	// Unified theme initialization - instant & blocking to prevent flash
+	// IMMEDIATE theme initialization - runs before any CSS is processed
 	(function() {
-		// Get stored preferences
-		const getDarkMode = () => {
-			if (typeof localStorage !== 'undefined' && localStorage.getItem('theme')) {
-				return localStorage.getItem('theme') === 'dark';
-			}
-			return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-		};
-		
-		const getColorTheme = () => {
-			if (typeof localStorage !== 'undefined' && localStorage.getItem('selected-theme')) {
-				return localStorage.getItem('selected-theme');
-			}
-			return 'default';
-		};
-		
-		// Apply themes immediately
-		const isDark = getDarkMode();
-		const colorTheme = getColorTheme();
-		
-		const classList = document.documentElement.classList;
-		classList.toggle('theme-dark', isDark);
-		classList.add(`theme-${colorTheme}`);
-		
-		// Basic persistence for initial load (ThemeManager will take over when components load)
-		if (typeof localStorage !== 'undefined') {
-			const observer = new MutationObserver(() => {
-				const currentDark = document.documentElement.classList.contains('theme-dark');
-				const currentColorTheme = Array.from(document.documentElement.classList)
-					.find(cls => cls.startsWith('theme-') && cls !== 'theme-dark')
-					?.replace('theme-', '') || 'default';
+		// Robust localStorage access with comprehensive error handling
+		const getStoredValue = (key, fallback) => {
+			try {
+				// Test localStorage availability first
+				if (typeof localStorage === 'undefined') return fallback;
 				
-				localStorage.setItem('theme', currentDark ? 'dark' : 'light');
-				localStorage.setItem('selected-theme', currentColorTheme);
-			});
-			observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+				// Attempt to read value
+				const value = localStorage.getItem(key);
+				return value || fallback;
+			} catch (error) {
+				// Handle various localStorage errors (quota exceeded, private browsing, etc.)
+				console.warn(`Theme initialization: localStorage access failed for "${key}":`, error.name);
+				return fallback;
+			}
+		};
+		
+		// Sanitize theme ID to prevent CSS injection
+		const sanitizeThemeId = (themeId) => {
+			return String(themeId).replace(/[^a-zA-Z0-9-_]/g, '') || 'default';
+		};
+		
+		// Get preferences with comprehensive fallbacks
+		const systemDarkPreference = window.matchMedia?.('(prefers-color-scheme: dark)').matches;
+		const darkPreference = getStoredValue('theme', systemDarkPreference ? 'dark' : 'light');
+		const rawColorTheme = getStoredValue('selected-theme', 'default');
+		const colorTheme = sanitizeThemeId(rawColorTheme);
+		
+		// Apply classes immediately with error boundary
+		try {
+			const docClass = document.documentElement.classList;
+			if (darkPreference === 'dark') docClass.add('theme-dark');
+			docClass.add(`theme-${colorTheme}`);
+			
+			// Set loading state indicator
+			document.documentElement.style.setProperty('--theme-loading', 'false');
+		} catch (error) {
+			console.error('Critical theme initialization error:', error);
+			// Fallback: ensure at least default theme is applied
+			document.documentElement.className += ' theme-default';
 		}
 	})();
 </script>
+
+<!-- Plotly.js for interactive charts -->
+<script src="https://cdn.plot.ly/plotly-2.24.1.min.js"></script>
