@@ -187,7 +187,11 @@ const {
       console.log(`🔧 Processing trace ${index}:`, { 
         type: trace.type, 
         hasExistingColor: !!trace.marker?.color,
-        existingColor: trace.marker?.color 
+        existingColor: trace.marker?.color,
+        isColorArray: Array.isArray(trace.marker?.color),
+        hasColorscale: !!trace.marker?.colorscale,
+        colorscale: trace.marker?.colorscale,
+        markerStructure: trace.marker
       });
       
       // For multiple traces, use categorical colors
@@ -265,11 +269,36 @@ const {
             ...trace.marker,
             color: colors.accent // Force override existing colors
           };
-        } else if (trace.type === 'scatter' && trace.mode?.includes('lines')) {
-          updatedTrace.line = {
-            ...trace.line,
-            color: colors.accent // Force override existing colors
-          };
+        } else if (trace.type === 'scatter') {
+          if (trace.mode?.includes('markers')) {
+            // Handle colorscale-based scatter plots (bubble plots)
+            if (Array.isArray(trace.marker?.color) && trace.marker?.colorscale) {
+              console.log(`🎨 Single trace colorscale plot detected, applying theme colorscale`);
+              const themeColorscale = createThemeColorscale(colors, trace.marker.colorscale);
+              updatedTrace.marker = {
+                ...trace.marker,
+                colorscale: themeColorscale,
+                line: {
+                  color: colors.backgroundColor,
+                  width: 1,
+                  ...trace.marker?.line
+                }
+              };
+              console.log(`🎨 Applied theme colorscale:`, themeColorscale);
+            } else {
+              // Regular solid color markers
+              updatedTrace.marker = {
+                ...trace.marker,
+                color: colors.accent
+              };
+            }
+          }
+          if (trace.mode?.includes('lines')) {
+            updatedTrace.line = {
+              ...trace.line,
+              color: colors.accent // Force override existing colors
+            };
+          }
         } else if (trace.type === 'pie') {
           updatedTrace.marker = {
             ...trace.marker,
