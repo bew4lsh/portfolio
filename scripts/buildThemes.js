@@ -61,12 +61,23 @@ function generateThemeCSS(theme) {
     `rgba(${accentRgb.r}, ${accentRgb.g}, ${accentRgb.b}, 0.33)` :
     theme.colors.accent.regular + '55';
   
-  // For dark themes (like Catppuccin Mocha), use the lightest gray for text over accents
-  // For light themes, use the darkest gray
-  const accentTextOver = theme.colors.gray ? 
-    (theme.colors.gray['999'] && theme.colors.gray['999'].startsWith('#1') ? 
-      theme.colors.gray['0'] : theme.colors.gray['999']) :
-    '#ffffff';
+  // Calculate proper contrast for text over accent backgrounds
+  const getLuminance = (hex) => {
+    const rgb = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    if (!rgb) return 0;
+    const [r, g, b] = [parseInt(rgb[1], 16), parseInt(rgb[2], 16), parseInt(rgb[3], 16)];
+    const sRGB = [r, g, b].map(c => {
+      c = c / 255;
+      return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+    });
+    return 0.2126 * sRGB[0] + 0.7152 * sRGB[1] + 0.0722 * sRGB[2];
+  };
+  
+  // Use white or dark text based on accent background luminance
+  const accentLuminance = getLuminance(theme.colors.accent.regular);
+  const accentTextOver = accentLuminance > 0.5 ? 
+    (theme.colors.gray ? theme.colors.gray['0'] || '#000000' : '#000000') :
+    (theme.colors.gray ? theme.colors.gray['999'] || '#ffffff' : '#ffffff');
 
   return `
     :root.theme-${theme.id} {

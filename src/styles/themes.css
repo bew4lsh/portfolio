@@ -62,7 +62,7 @@
       --accent-dark: #b4befe;
       --accent-overlay: rgba(203, 166, 247, 0.33);
       --accent-subtle-overlay: rgba(203, 166, 247, 0.33);
-      --accent-text-over: #cdd6f4;
+      --accent-text-over: #11111b;
       
       /* Theme-aware background gradients */
       --bg-gradient-subtle: linear-gradient(135deg, #b4befe30, transparent 50%, #f9e2af20);
