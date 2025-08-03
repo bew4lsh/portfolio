@@ -38,7 +38,180 @@ const {
 </div>
 
 <script>
-  import { createThemedPlotlyConfig, getCurrentThemeColors } from '../utils/plotlyTheme.ts';
+  // Theme-aware Plotly utilities (inlined for browser compatibility)
+  function getCurrentThemeColors() {
+    if (typeof document === 'undefined') {
+      // Server-side fallback
+      return {
+        accent: '#7611a6',
+        primary: ['#7611a6', '#c561f6', '#1c0056', '#9d4edd', '#5a189a'],
+        categorical: ['#7611a6', '#2E86AB', '#F77F00', '#06D6A0', '#E63946'],
+        textColor: '#3d4663',
+        backgroundColor: '#ffffff',
+        gridColor: '#e3e6ee'
+      };
+    }
+
+    const style = getComputedStyle(document.documentElement);
+    return {
+      accent: style.getPropertyValue('--accent-regular').trim(),
+      accentLight: style.getPropertyValue('--accent-light').trim(),
+      accentDark: style.getPropertyValue('--accent-dark').trim(),
+      primary: [
+        style.getPropertyValue('--chart-color-1').trim(),
+        style.getPropertyValue('--chart-color-2').trim(),
+        style.getPropertyValue('--chart-color-3').trim(),
+        style.getPropertyValue('--chart-color-4').trim(),
+        style.getPropertyValue('--chart-color-5').trim()
+      ].filter(color => color && color !== ''),
+      categorical: [
+        style.getPropertyValue('--chart-categorical-1').trim(),
+        style.getPropertyValue('--chart-categorical-2').trim(),
+        style.getPropertyValue('--chart-categorical-3').trim(),
+        style.getPropertyValue('--chart-categorical-4').trim(),
+        style.getPropertyValue('--chart-categorical-5').trim(),
+        style.getPropertyValue('--chart-categorical-6').trim(),
+        style.getPropertyValue('--chart-categorical-7').trim(),
+        style.getPropertyValue('--chart-categorical-8').trim()
+      ].filter(color => color && color !== ''),
+      textColor: style.getPropertyValue('--gray-200').trim(),
+      backgroundColor: style.getPropertyValue('--gray-999').trim(),
+      gridColor: style.getPropertyValue('--gray-800').trim()
+    };
+  }
+
+  function createThemedLayout(customLayout = {}) {
+    const colors = getCurrentThemeColors();
+    
+    return {
+      paper_bgcolor: 'transparent',
+      plot_bgcolor: 'transparent',
+      font: {
+        family: 'Public Sans, system-ui, sans-serif',
+        color: colors.textColor,
+        size: 12
+      },
+      colorway: colors.categorical,
+      margin: { l: 60, r: 40, t: 60, b: 60 },
+      
+      xaxis: {
+        gridcolor: colors.gridColor,
+        linecolor: colors.gridColor,
+        tickcolor: colors.gridColor,
+        tickfont: { color: colors.textColor, size: 11 },
+        titlefont: { color: colors.textColor, size: 13 },
+        ...customLayout.xaxis
+      },
+      yaxis: {
+        gridcolor: colors.gridColor,
+        linecolor: colors.gridColor,
+        tickcolor: colors.gridColor,
+        tickfont: { color: colors.textColor, size: 11 },
+        titlefont: { color: colors.textColor, size: 13 },
+        ...customLayout.yaxis
+      },
+      
+      legend: {
+        font: { color: colors.textColor, size: 11 },
+        bgcolor: 'transparent',
+        bordercolor: colors.gridColor,
+        ...customLayout.legend
+      },
+      
+      title: {
+        font: { color: colors.textColor, size: 16 },
+        ...customLayout.title
+      },
+      
+      ...customLayout
+    };
+  }
+
+  function applyThemeToTraces(data) {
+    const colors = getCurrentThemeColors();
+    
+    return data.map((trace, index) => {
+      const updatedTrace = { ...trace };
+      
+      // For multiple traces, use categorical colors
+      if (data.length > 1 && colors.categorical.length > 0) {
+        const colorIndex = index % colors.categorical.length;
+        const traceColor = colors.categorical[colorIndex];
+        
+        if (trace.type === 'bar') {
+          updatedTrace.marker = {
+            ...trace.marker,
+            color: trace.marker?.color || traceColor,
+            line: {
+              color: colors.gridColor,
+              width: 1,
+              ...trace.marker?.line
+            }
+          };
+        } else if (trace.type === 'scatter') {
+          if (trace.mode?.includes('markers')) {
+            updatedTrace.marker = {
+              ...trace.marker,
+              color: trace.marker?.color || traceColor,
+              line: {
+                color: colors.backgroundColor,
+                width: 1,
+                ...trace.marker?.line
+              }
+            };
+          }
+          if (trace.mode?.includes('lines')) {
+            updatedTrace.line = {
+              ...trace.line,
+              color: trace.line?.color || traceColor,
+              width: 2
+            };
+          }
+        } else if (trace.type === 'pie') {
+          updatedTrace.marker = {
+            ...trace.marker,
+            colors: trace.marker?.colors || colors.categorical,
+            line: {
+              color: colors.backgroundColor,
+              width: 2,
+              ...trace.marker?.line
+            }
+          };
+        }
+      }
+      
+      // For single traces, use accent color
+      if (data.length === 1) {
+        if (trace.type === 'bar') {
+          updatedTrace.marker = {
+            ...trace.marker,
+            color: trace.marker?.color || colors.accent
+          };
+        } else if (trace.type === 'scatter' && trace.mode?.includes('lines')) {
+          updatedTrace.line = {
+            ...trace.line,
+            color: trace.line?.color || colors.accent
+          };
+        }
+      }
+      
+      return updatedTrace;
+    });
+  }
+
+  function createThemedPlotlyConfig(data, customLayout = {}, customConfig = {}) {
+    return {
+      data: applyThemeToTraces(data),
+      layout: createThemedLayout(customLayout),
+      config: {
+        responsive: true,
+        displayModeBar: 'hover',
+        modeBarButtonsToRemove: ['pan2d', 'lasso2d', 'select2d'],
+        displaylogo: false,
+        ...customConfig
+      }
+    };
+  }
   
   // Plotly chart initialization with comprehensive theming
   function initializePlotlyChart(container) {
