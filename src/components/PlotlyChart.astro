@@ -53,7 +53,7 @@ const {
     }
 
     const style = getComputedStyle(document.documentElement);
-    return {
+    const colors = {
       accent: style.getPropertyValue('--accent-regular').trim(),
       accentLight: style.getPropertyValue('--accent-light').trim(),
       accentDark: style.getPropertyValue('--accent-dark').trim(),
@@ -78,6 +78,16 @@ const {
       backgroundColor: style.getPropertyValue('--gray-999').trim(),
       gridColor: style.getPropertyValue('--gray-800').trim()
     };
+    
+    // Debug: Log theme colors to console
+    console.log('🎨 Current theme colors:', {
+      accent: colors.accent,
+      categorical: colors.categorical,
+      textColor: colors.textColor,
+      currentTheme: document.documentElement.className
+    });
+    
+    return colors;
   }
 
   function createThemedLayout(customLayout = {}) {
@@ -130,18 +140,32 @@ const {
   function applyThemeToTraces(data) {
     const colors = getCurrentThemeColors();
     
+    console.log('📊 Applying theme to traces:', { 
+      traceCount: data.length, 
+      availableColors: colors.categorical.length,
+      accent: colors.accent
+    });
+    
     return data.map((trace, index) => {
       const updatedTrace = { ...trace };
+      
+      console.log(`🔧 Processing trace ${index}:`, { 
+        type: trace.type, 
+        hasExistingColor: !!trace.marker?.color,
+        existingColor: trace.marker?.color 
+      });
       
       // For multiple traces, use categorical colors
       if (data.length > 1 && colors.categorical.length > 0) {
         const colorIndex = index % colors.categorical.length;
         const traceColor = colors.categorical[colorIndex];
         
+        console.log(`🎯 Multi-trace ${index}: using color ${traceColor} (index ${colorIndex})`);
+        
         if (trace.type === 'bar') {
           updatedTrace.marker = {
             ...trace.marker,
-            color: trace.marker?.color || traceColor,
+            color: traceColor, // Force override existing colors
             line: {
               color: colors.gridColor,
               width: 1,
@@ -152,7 +176,7 @@ const {
           if (trace.mode?.includes('markers')) {
             updatedTrace.marker = {
               ...trace.marker,
-              color: trace.marker?.color || traceColor,
+              color: traceColor, // Force override existing colors
               line: {
                 color: colors.backgroundColor,
                 width: 1,
@@ -163,14 +187,14 @@ const {
           if (trace.mode?.includes('lines')) {
             updatedTrace.line = {
               ...trace.line,
-              color: trace.line?.color || traceColor,
+              color: traceColor, // Force override existing colors
               width: 2
             };
           }
         } else if (trace.type === 'pie') {
           updatedTrace.marker = {
             ...trace.marker,
-            colors: trace.marker?.colors || colors.categorical,
+            colors: colors.categorical, // Force override existing colors
             line: {
               color: colors.backgroundColor,
               width: 2,
@@ -182,18 +206,29 @@ const {
       
       // For single traces, use accent color
       if (data.length === 1) {
+        console.log(`🎯 Single trace: using accent color ${colors.accent}`);
+        
         if (trace.type === 'bar') {
           updatedTrace.marker = {
             ...trace.marker,
-            color: trace.marker?.color || colors.accent
+            color: colors.accent // Force override existing colors
           };
         } else if (trace.type === 'scatter' && trace.mode?.includes('lines')) {
           updatedTrace.line = {
             ...trace.line,
-            color: trace.line?.color || colors.accent
+            color: colors.accent // Force override existing colors
+          };
+        } else if (trace.type === 'pie') {
+          updatedTrace.marker = {
+            ...trace.marker,
+            colors: colors.categorical // Force override existing colors
           };
         }
       }
+      
+      console.log(`✅ Updated trace ${index}:`, { 
+        finalColor: updatedTrace.marker?.color || updatedTrace.line?.color || updatedTrace.marker?.colors 
+      });
       
       return updatedTrace;
     });
