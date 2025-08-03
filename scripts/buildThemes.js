@@ -33,6 +33,18 @@ function generateThemeCSS(theme) {
   ` : '';
 
   const { primary, categorical, gradient } = theme.colors.charts;
+  
+  // Calculate hue rotation for image theming based on accent color
+  const getThemeHueRotate = (theme) => {
+    const themeHues = {
+      'default': '280deg',        // Purple theme
+      'ocean-blue': '200deg',     // Blue theme  
+      'forest-green': '120deg',   // Green theme
+      'catppuccin-latte': '350deg', // Pink/red theme
+      'catppuccin-mocha': '260deg'  // Purple/pink theme
+    };
+    return themeHues[theme.id] || '0deg';
+  };
 
   // Generate accent overlay colors for proper contrast
   const hexToRgb = (hex) => {
@@ -64,6 +76,14 @@ function generateThemeCSS(theme) {
       --accent-overlay: ${accentOverlay};
       --accent-subtle-overlay: ${accentOverlay};
       --accent-text-over: ${accentTextOver};
+      
+      /* Theme-aware background gradients */
+      --bg-gradient-subtle: linear-gradient(135deg, ${theme.colors.accent.dark}15, transparent 50%, ${theme.colors.accent.light}08);
+      --bg-gradient-hero: radial-gradient(ellipse 60% 50% at 50% 0%, ${theme.colors.accent.light}12, transparent 60%);
+      --bg-gradient-footer: linear-gradient(180deg, ${theme.colors.accent.dark}08, ${theme.colors.accent.regular}15);
+      
+      /* Theme-aware image filters */
+      --img-theme-filter: sepia(0.3) hue-rotate(${getThemeHueRotate(theme)}) saturate(0.8) brightness(1.1);
       ${grayVars}
       --chart-color-1: ${getChartColor(primary, 0)};
       --chart-color-2: ${getChartColor(primary, 1)};

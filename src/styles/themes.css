@@ -12,6 +12,14 @@
       --accent-subtle-overlay: rgba(210, 15, 57, 0.33);
       --accent-text-over: #eff1f5;
       
+      /* Theme-aware background gradients */
+      --bg-gradient-subtle: linear-gradient(135deg, #8839ef15, transparent 50%, #fe640b08);
+      --bg-gradient-hero: radial-gradient(ellipse 60% 50% at 50% 0%, #fe640b12, transparent 60%);
+      --bg-gradient-footer: linear-gradient(180deg, #8839ef08, #d20f3915);
+      
+      /* Theme-aware image filters */
+      --img-theme-filter: sepia(0.3) hue-rotate(350deg) saturate(0.8) brightness(1.1);
+      
       --gray-0: #4c4f69;
       --gray-50: #5c5f77;
       --gray-100: #6c6f85;
@@ -53,6 +61,14 @@
       --accent-overlay: rgba(203, 166, 247, 0.33);
       --accent-subtle-overlay: rgba(203, 166, 247, 0.33);
       --accent-text-over: #cdd6f4;
+      
+      /* Theme-aware background gradients */
+      --bg-gradient-subtle: linear-gradient(135deg, #b4befe15, transparent 50%, #f9e2af08);
+      --bg-gradient-hero: radial-gradient(ellipse 60% 50% at 50% 0%, #f9e2af12, transparent 60%);
+      --bg-gradient-footer: linear-gradient(180deg, #b4befe08, #cba6f715);
+      
+      /* Theme-aware image filters */
+      --img-theme-filter: sepia(0.3) hue-rotate(260deg) saturate(0.8) brightness(1.1);
       
       --gray-0: #cdd6f4;
       --gray-50: #bac2de;
@@ -96,6 +112,14 @@
       --accent-subtle-overlay: rgba(118, 17, 166, 0.33);
       --accent-text-over: #ffffff;
       
+      /* Theme-aware background gradients */
+      --bg-gradient-subtle: linear-gradient(135deg, #1c005615, transparent 50%, #c561f608);
+      --bg-gradient-hero: radial-gradient(ellipse 60% 50% at 50% 0%, #c561f612, transparent 60%);
+      --bg-gradient-footer: linear-gradient(180deg, #1c005608, #7611a615);
+      
+      /* Theme-aware image filters */
+      --img-theme-filter: sepia(0.3) hue-rotate(280deg) saturate(0.8) brightness(1.1);
+      
       --chart-color-1: #7611a6;
       --chart-color-2: #c561f6;
       --chart-color-3: #1c0056;
@@ -124,6 +148,14 @@
       --accent-overlay: rgba(76, 175, 80, 0.33);
       --accent-subtle-overlay: rgba(76, 175, 80, 0.33);
       --accent-text-over: #fafafa;
+      
+      /* Theme-aware background gradients */
+      --bg-gradient-subtle: linear-gradient(135deg, #1b5e2015, transparent 50%, #81c78408);
+      --bg-gradient-hero: radial-gradient(ellipse 60% 50% at 50% 0%, #81c78412, transparent 60%);
+      --bg-gradient-footer: linear-gradient(180deg, #1b5e2008, #4caf5015);
+      
+      /* Theme-aware image filters */
+      --img-theme-filter: sepia(0.3) hue-rotate(120deg) saturate(0.8) brightness(1.1);
       
       --gray-0: #3e2723;
       --gray-50: #4e342e;
@@ -166,6 +198,14 @@
       --accent-overlay: rgba(33, 150, 243, 0.33);
       --accent-subtle-overlay: rgba(33, 150, 243, 0.33);
       --accent-text-over: #ffffff;
+      
+      /* Theme-aware background gradients */
+      --bg-gradient-subtle: linear-gradient(135deg, #0d47a115, transparent 50%, #4fc3f708);
+      --bg-gradient-hero: radial-gradient(ellipse 60% 50% at 50% 0%, #4fc3f712, transparent 60%);
+      --bg-gradient-footer: linear-gradient(180deg, #0d47a108, #2196f315);
+      
+      /* Theme-aware image filters */
+      --img-theme-filter: sepia(0.3) hue-rotate(200deg) saturate(0.8) brightness(1.1);
       
       --gray-0: #37474f;
       --gray-50: #455a64;

@@ -260,3 +260,25 @@ h5 {
 		gap: 12rem;
 	}
 }
+
+/* Theme-aware background system */
+.with-background {
+	position: relative;
+}
+
+.with-background::before {
+	content: '';
+	position: absolute;
+	pointer-events: none;
+	left: 50%;
+	width: 100vw;
+	height: 100%;
+	top: 0;
+	transform: translateY(-50%) translateX(-50%);
+	background: var(--bg-gradient-subtle), var(--gray-999);
+	z-index: -1;
+}
+
+.with-background.bg-variant::before {
+	background: var(--bg-gradient-hero), var(--gray-999);
+}
