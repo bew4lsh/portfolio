@@ -1,7 +1,6 @@
 ---
 import Icon from './Icon.astro';
 import type { iconPaths } from './IconPaths';
-import ThemeToggle from './ThemeToggle.astro';
 import ThemeSelector from './ThemeSelector.astro';
 
 // Get the base URL from Astro config and ensure it ends with a slash
@@ -102,7 +101,6 @@ const isCurrentPage = (href: string) => {
 
 			<div class="theme-controls">
 				<ThemeSelector />
-				<ThemeToggle />
 			</div>
 		</div>
 	</div>
