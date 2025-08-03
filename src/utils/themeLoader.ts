@@ -12,6 +12,12 @@ export async function loadThemes(): Promise<Theme[]> {
 }
 
 export function generateThemeCSS(theme: Theme): string {
+  // Helper function for safe circular color access with fallback
+  const getChartColor = (colors: string[], index: number, fallback = '#7611a6'): string => {
+    if (!colors || colors.length === 0) return fallback;
+    return colors[index % colors.length] || fallback;
+  };
+
   const grayVars = theme.colors.gray ? `
       --gray-0: ${theme.colors.gray['0']};
       --gray-50: ${theme.colors.gray['50']};
@@ -27,30 +33,32 @@ export function generateThemeCSS(theme: Theme): string {
       --gray-999: ${theme.colors.gray['999']};
   ` : '';
 
+  const { primary, categorical, gradient } = theme.colors.charts;
+
   return `
     :root.theme-${theme.id} {
       --accent-light: ${theme.colors.accent.light};
       --accent-regular: ${theme.colors.accent.regular};
       --accent-dark: ${theme.colors.accent.dark};
       ${grayVars}
-      --chart-color-1: ${theme.colors.charts.primary[0]};
-      --chart-color-2: ${theme.colors.charts.primary[1]};
-      --chart-color-3: ${theme.colors.charts.primary[2]};
-      --chart-color-4: ${theme.colors.charts.primary[3] || theme.colors.charts.primary[0]};
-      --chart-color-5: ${theme.colors.charts.primary[4] || theme.colors.charts.primary[1]};
+      --chart-color-1: ${getChartColor(primary, 0)};
+      --chart-color-2: ${getChartColor(primary, 1)};
+      --chart-color-3: ${getChartColor(primary, 2)};
+      --chart-color-4: ${getChartColor(primary, 3)};
+      --chart-color-5: ${getChartColor(primary, 4)};
       
-      --chart-categorical-1: ${theme.colors.charts.categorical[0]};
-      --chart-categorical-2: ${theme.colors.charts.categorical[1]};
-      --chart-categorical-3: ${theme.colors.charts.categorical[2]};
-      --chart-categorical-4: ${theme.colors.charts.categorical[3]};
-      --chart-categorical-5: ${theme.colors.charts.categorical[4]};
-      --chart-categorical-6: ${theme.colors.charts.categorical[5] || theme.colors.charts.categorical[0]};
-      --chart-categorical-7: ${theme.colors.charts.categorical[6] || theme.colors.charts.categorical[1]};
-      --chart-categorical-8: ${theme.colors.charts.categorical[7] || theme.colors.charts.categorical[2]};
+      --chart-categorical-1: ${getChartColor(categorical, 0)};
+      --chart-categorical-2: ${getChartColor(categorical, 1)};
+      --chart-categorical-3: ${getChartColor(categorical, 2)};
+      --chart-categorical-4: ${getChartColor(categorical, 3)};
+      --chart-categorical-5: ${getChartColor(categorical, 4)};
+      --chart-categorical-6: ${getChartColor(categorical, 5)};
+      --chart-categorical-7: ${getChartColor(categorical, 6)};
+      --chart-categorical-8: ${getChartColor(categorical, 7)};
       
-      --gradient-stop-1: ${theme.colors.charts.gradient[0]};
-      --gradient-stop-2: ${theme.colors.charts.gradient[1]};
-      --gradient-stop-3: ${theme.colors.charts.gradient[2]};
+      --gradient-stop-1: ${getChartColor(gradient, 0)};
+      --gradient-stop-2: ${getChartColor(gradient, 1)};
+      --gradient-stop-3: ${getChartColor(gradient, 2)};
     }
   `;
 }
@@ -81,43 +89,3 @@ export function getThemeChartColors(theme: Theme) {
   };
 }
 
-export function getCurrentTheme(): string {
-  if (typeof document === 'undefined') return 'default';
-  
-  // Check for theme class on document element
-  const classList = document.documentElement.classList;
-  for (const className of classList) {
-    if (className.startsWith('theme-')) {
-      return className.replace('theme-', '');
-    }
-  }
-  
-  return 'default';
-}
-
-export function applyTheme(themeId: string): void {
-  if (typeof document === 'undefined') return;
-  
-  // Remove existing theme classes
-  const classList = document.documentElement.classList;
-  const existingThemes = Array.from(classList).filter(cls => cls.startsWith('theme-'));
-  existingThemes.forEach(theme => classList.remove(theme));
-  
-  // Add new theme class
-  classList.add(`theme-${themeId}`);
-  
-  // Save to localStorage
-  if (typeof localStorage !== 'undefined') {
-    localStorage.setItem('selected-theme', themeId);
-  }
-  
-  // Dispatch custom event for components to listen to
-  document.dispatchEvent(new CustomEvent('theme-changed', { 
-    detail: { themeId } 
-  }));
-}
-
-export function getStoredTheme(): string {
-  if (typeof localStorage === 'undefined') return 'default';
-  return localStorage.getItem('selected-theme') || 'default';
-}

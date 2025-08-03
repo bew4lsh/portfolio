@@ -53,53 +53,15 @@ const themes = await loadThemes();
 </div>
 
 <script>
-  // Client-side theme utilities (avoid importing server-only modules)
-  function getCurrentTheme() {
-    if (typeof document === 'undefined') return 'default';
-    
-    // Check for theme class on document element
-    const classList = document.documentElement.classList;
-    for (const className of classList) {
-      if (className.startsWith('theme-')) {
-        return className.replace('theme-', '');
-      }
-    }
-    
-    return 'default';
-  }
-
-  function applyTheme(themeId) {
-    if (typeof document === 'undefined') return;
-    
-    // Remove existing theme classes
-    const classList = document.documentElement.classList;
-    const existingThemes = Array.from(classList).filter(cls => cls.startsWith('theme-'));
-    existingThemes.forEach(theme => classList.remove(theme));
-    
-    // Add new theme class
-    classList.add(`theme-${themeId}`);
-    
-    // Save to localStorage
-    if (typeof localStorage !== 'undefined') {
-      localStorage.setItem('selected-theme', themeId);
-    }
-    
-    // Dispatch custom event for components to listen to
-    document.dispatchEvent(new CustomEvent('theme-changed', { 
-      detail: { themeId } 
-    }));
-  }
-
-  function getStoredTheme() {
-    if (typeof localStorage === 'undefined') return 'default';
-    return localStorage.getItem('selected-theme') || 'default';
-  }
+  // Import unified theme manager
+  import { ThemeManager } from '../utils/clientThemeManager.js';
   
   class ThemeSelector {
     constructor() {
       this.toggle = document.getElementById('theme-toggle');
       this.menu = document.getElementById('theme-menu');
       this.isOpen = false;
+      this.themeManager = ThemeManager.getInstance();
       
       this.init();
     }
@@ -138,11 +100,7 @@ const themes = await loadThemes();
         this.updateActiveTheme();
       });
       
-      // Apply stored theme on page load
-      const storedTheme = getStoredTheme();
-      if (storedTheme !== 'default') {
-        applyTheme(storedTheme);
-      }
+      // Theme manager handles initial state automatically
     }
     
     toggleMenu() {
@@ -158,12 +116,12 @@ const themes = await loadThemes();
     }
     
     selectTheme(themeId) {
-      applyTheme(themeId);
+      this.themeManager.setColorTheme(themeId);
       this.updateActiveTheme();
     }
     
     updateActiveTheme() {
-      const currentTheme = getCurrentTheme();
+      const currentTheme = this.themeManager.getCurrentColorTheme();
       
       // Update visual indicators
       const options = this.menu.querySelectorAll('.theme-option');
