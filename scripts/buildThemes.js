@@ -83,7 +83,9 @@ function generateThemeCSS(theme) {
       --bg-gradient-footer: linear-gradient(180deg, ${theme.colors.accent.dark}08, ${theme.colors.accent.regular}15);
       
       /* Theme-aware image filters */
-      --img-theme-filter: sepia(0.3) hue-rotate(${getThemeHueRotate(theme)}) saturate(0.8) brightness(1.1);
+      --img-theme-filter: sepia(0.4) hue-rotate(${getThemeHueRotate(theme)}) saturate(1.2) brightness(1.05) contrast(1.1);
+      --img-theme-filter-subtle: sepia(0.2) hue-rotate(${getThemeHueRotate(theme)}) saturate(1.0) brightness(1.02);
+      --img-theme-filter-none: none;
       ${grayVars}
       --chart-color-1: ${getChartColor(primary, 0)};
       --chart-color-2: ${getChartColor(primary, 1)};

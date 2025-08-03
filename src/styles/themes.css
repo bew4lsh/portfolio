@@ -18,7 +18,9 @@
       --bg-gradient-footer: linear-gradient(180deg, #8839ef08, #d20f3915);
       
       /* Theme-aware image filters */
-      --img-theme-filter: sepia(0.3) hue-rotate(350deg) saturate(0.8) brightness(1.1);
+      --img-theme-filter: sepia(0.4) hue-rotate(350deg) saturate(1.2) brightness(1.05) contrast(1.1);
+      --img-theme-filter-subtle: sepia(0.2) hue-rotate(350deg) saturate(1.0) brightness(1.02);
+      --img-theme-filter-none: none;
       
       --gray-0: #4c4f69;
       --gray-50: #5c5f77;
@@ -68,7 +70,9 @@
       --bg-gradient-footer: linear-gradient(180deg, #b4befe08, #cba6f715);
       
       /* Theme-aware image filters */
-      --img-theme-filter: sepia(0.3) hue-rotate(260deg) saturate(0.8) brightness(1.1);
+      --img-theme-filter: sepia(0.4) hue-rotate(260deg) saturate(1.2) brightness(1.05) contrast(1.1);
+      --img-theme-filter-subtle: sepia(0.2) hue-rotate(260deg) saturate(1.0) brightness(1.02);
+      --img-theme-filter-none: none;
       
       --gray-0: #cdd6f4;
       --gray-50: #bac2de;
@@ -118,7 +122,9 @@
       --bg-gradient-footer: linear-gradient(180deg, #1c005608, #7611a615);
       
       /* Theme-aware image filters */
-      --img-theme-filter: sepia(0.3) hue-rotate(280deg) saturate(0.8) brightness(1.1);
+      --img-theme-filter: sepia(0.4) hue-rotate(280deg) saturate(1.2) brightness(1.05) contrast(1.1);
+      --img-theme-filter-subtle: sepia(0.2) hue-rotate(280deg) saturate(1.0) brightness(1.02);
+      --img-theme-filter-none: none;
       
       --chart-color-1: #7611a6;
       --chart-color-2: #c561f6;
@@ -155,7 +161,9 @@
       --bg-gradient-footer: linear-gradient(180deg, #1b5e2008, #4caf5015);
       
       /* Theme-aware image filters */
-      --img-theme-filter: sepia(0.3) hue-rotate(120deg) saturate(0.8) brightness(1.1);
+      --img-theme-filter: sepia(0.4) hue-rotate(120deg) saturate(1.2) brightness(1.05) contrast(1.1);
+      --img-theme-filter-subtle: sepia(0.2) hue-rotate(120deg) saturate(1.0) brightness(1.02);
+      --img-theme-filter-none: none;
       
       --gray-0: #3e2723;
       --gray-50: #4e342e;
@@ -205,7 +213,9 @@
       --bg-gradient-footer: linear-gradient(180deg, #0d47a108, #2196f315);
       
       /* Theme-aware image filters */
-      --img-theme-filter: sepia(0.3) hue-rotate(200deg) saturate(0.8) brightness(1.1);
+      --img-theme-filter: sepia(0.4) hue-rotate(200deg) saturate(1.2) brightness(1.05) contrast(1.1);
+      --img-theme-filter-subtle: sepia(0.2) hue-rotate(200deg) saturate(1.0) brightness(1.02);
+      --img-theme-filter-none: none;
       
       --gray-0: #37474f;
       --gray-50: #455a64;
