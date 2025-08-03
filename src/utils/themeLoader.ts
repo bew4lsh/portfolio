@@ -12,12 +12,27 @@ export async function loadThemes(): Promise<Theme[]> {
 }
 
 export function generateThemeCSS(theme: Theme): string {
+  const grayVars = theme.colors.gray ? `
+      --gray-0: ${theme.colors.gray['0']};
+      --gray-50: ${theme.colors.gray['50']};
+      --gray-100: ${theme.colors.gray['100']};
+      --gray-200: ${theme.colors.gray['200']};
+      --gray-300: ${theme.colors.gray['300']};
+      --gray-400: ${theme.colors.gray['400']};
+      --gray-500: ${theme.colors.gray['500']};
+      --gray-600: ${theme.colors.gray['600']};
+      --gray-700: ${theme.colors.gray['700']};
+      --gray-800: ${theme.colors.gray['800']};
+      --gray-900: ${theme.colors.gray['900']};
+      --gray-999: ${theme.colors.gray['999']};
+  ` : '';
+
   return `
     :root.theme-${theme.id} {
       --accent-light: ${theme.colors.accent.light};
       --accent-regular: ${theme.colors.accent.regular};
       --accent-dark: ${theme.colors.accent.dark};
-      
+      ${grayVars}
       --chart-color-1: ${theme.colors.charts.primary[0]};
       --chart-color-2: ${theme.colors.charts.primary[1]};
       --chart-color-3: ${theme.colors.charts.primary[2]};

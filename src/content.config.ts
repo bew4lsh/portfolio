@@ -48,6 +48,20 @@ export const collections = {
 					regular: z.string(),
 					dark: z.string()
 				}),
+				gray: z.object({
+					'0': z.string(),
+					'50': z.string(),
+					'100': z.string(),
+					'200': z.string(),
+					'300': z.string(),
+					'400': z.string(),
+					'500': z.string(),
+					'600': z.string(),
+					'700': z.string(),
+					'800': z.string(),
+					'900': z.string(),
+					'999': z.string()
+				}).optional(),
 				charts: z.object({
 					primary: z.array(z.string()),
 					categorical: z.array(z.string()),
