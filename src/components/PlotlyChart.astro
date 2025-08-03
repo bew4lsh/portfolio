@@ -90,6 +90,41 @@ const {
     return colors;
   }
 
+  // Create theme-aware colorscale for bubble plots and heatmaps
+  function createThemeColorscale(colors, originalColorscale) {
+    // Map common colorscales to theme-aware versions
+    const themeColorscales = {
+      'RdYlGn': [
+        [0, colors.categorical[6] || '#E63946'], // Red equivalent
+        [0.5, colors.categorical[3] || '#F77F00'], // Yellow/Orange equivalent  
+        [1, colors.categorical[0] || colors.accent] // Green/Primary equivalent
+      ],
+      'Viridis': [
+        [0, colors.categorical[4] || '#440154'],
+        [0.25, colors.categorical[3] || '#31688e'],
+        [0.75, colors.categorical[1] || '#35b779'],
+        [1, colors.categorical[2] || '#fde725']
+      ],
+      'Blues': [
+        [0, colors.backgroundColor],
+        [0.5, colors.categorical[1] || colors.accent],
+        [1, colors.accentDark || colors.accent]
+      ],
+      'Reds': [
+        [0, colors.backgroundColor],
+        [0.5, colors.categorical[4] || colors.accent],
+        [1, colors.categorical[6] || colors.accent]
+      ]
+    };
+
+    // Return theme colorscale if we have a mapping, otherwise create a simple gradient
+    return themeColorscales[originalColorscale] || [
+      [0, colors.categorical[4] || colors.accent],
+      [0.5, colors.categorical[1] || colors.accent],
+      [1, colors.categorical[0] || colors.accent]
+    ];
+  }
+
   function createThemedLayout(customLayout = {}) {
     const colors = getCurrentThemeColors();
     
@@ -174,15 +209,32 @@ const {
           };
         } else if (trace.type === 'scatter') {
           if (trace.mode?.includes('markers')) {
-            updatedTrace.marker = {
-              ...trace.marker,
-              color: traceColor, // Force override existing colors
-              line: {
-                color: colors.backgroundColor,
-                width: 1,
-                ...trace.marker?.line
-              }
-            };
+            // Handle different marker coloring scenarios
+            if (Array.isArray(trace.marker?.color) && trace.marker?.colorscale) {
+              // Colorscale-based coloring (like bubble plots) - create theme-aware colorscale
+              const themeColorscale = createThemeColorscale(colors, trace.marker.colorscale);
+              updatedTrace.marker = {
+                ...trace.marker,
+                colorscale: themeColorscale,
+                line: {
+                  color: colors.backgroundColor,
+                  width: 1,
+                  ...trace.marker?.line
+                }
+              };
+              console.log(`🎨 Applied theme colorscale for scatter plot:`, themeColorscale);
+            } else {
+              // Regular solid color markers
+              updatedTrace.marker = {
+                ...trace.marker,
+                color: traceColor, // Force override existing colors
+                line: {
+                  color: colors.backgroundColor,
+                  width: 1,
+                  ...trace.marker?.line
+                }
+              };
+            }
           }
           if (trace.mode?.includes('lines')) {
             updatedTrace.line = {
