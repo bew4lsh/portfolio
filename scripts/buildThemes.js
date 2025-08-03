@@ -34,11 +34,36 @@ function generateThemeCSS(theme) {
 
   const { primary, categorical, gradient } = theme.colors.charts;
 
+  // Generate accent overlay colors for proper contrast
+  const hexToRgb = (hex) => {
+    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result ? {
+      r: parseInt(result[1], 16),
+      g: parseInt(result[2], 16),
+      b: parseInt(result[3], 16)
+    } : null;
+  };
+  
+  const accentRgb = hexToRgb(theme.colors.accent.regular);
+  const accentOverlay = accentRgb ? 
+    `rgba(${accentRgb.r}, ${accentRgb.g}, ${accentRgb.b}, 0.33)` :
+    theme.colors.accent.regular + '55';
+  
+  // For dark themes (like Catppuccin Mocha), use the lightest gray for text over accents
+  // For light themes, use the darkest gray
+  const accentTextOver = theme.colors.gray ? 
+    (theme.colors.gray['999'] && theme.colors.gray['999'].startsWith('#1') ? 
+      theme.colors.gray['0'] : theme.colors.gray['999']) :
+    '#ffffff';
+
   return `
     :root.theme-${theme.id} {
       --accent-light: ${theme.colors.accent.light};
       --accent-regular: ${theme.colors.accent.regular};
       --accent-dark: ${theme.colors.accent.dark};
+      --accent-overlay: ${accentOverlay};
+      --accent-subtle-overlay: ${accentOverlay};
+      --accent-text-over: ${accentTextOver};
       ${grayVars}
       --chart-color-1: ${getChartColor(primary, 0)};
       --chart-color-2: ${getChartColor(primary, 1)};
