@@ -13,28 +13,11 @@ const {
   id, 
   data, 
   layout = {}, 
-  config = { responsive: true, displayModeBar: 'hover' },
+  config = {},
   height = '400px',
   width = '100%',
   className = ''
 } = Astro.props;
-
-// Default layout settings that work well with the portfolio theme
-const defaultLayout = {
-  paper_bgcolor: 'transparent',
-  plot_bgcolor: 'transparent',
-  font: {
-    family: 'Public Sans, system-ui, sans-serif',
-    color: 'var(--gray-200)'
-  },
-  margin: {
-    l: 60,
-    r: 40,
-    t: 60,
-    b: 60
-  },
-  ...layout
-};
 ---
 
 <div 
@@ -42,7 +25,7 @@ const defaultLayout = {
   class={`plotly-chart ${className}`}
   style={`height: ${height}; width: ${width}; min-height: ${height};`}
   data-plotly-data={JSON.stringify(data)}
-  data-plotly-layout={JSON.stringify(defaultLayout)}
+  data-plotly-layout={JSON.stringify(layout)}
   data-plotly-config={JSON.stringify(config)}
 >
   <!-- Loading skeleton -->
@@ -55,77 +38,17 @@ const defaultLayout = {
 </div>
 
 <script>
-  // Get current theme colors from CSS variables
-  function getThemeColors() {
-    const style = getComputedStyle(document.documentElement);
-    return {
-      accent: style.getPropertyValue('--accent-regular').trim(),
-      accentLight: style.getPropertyValue('--accent-light').trim(),
-      accentDark: style.getPropertyValue('--accent-dark').trim(),
-      chartColors: [
-        style.getPropertyValue('--chart-categorical-1').trim(),
-        style.getPropertyValue('--chart-categorical-2').trim(),
-        style.getPropertyValue('--chart-categorical-3').trim(),
-        style.getPropertyValue('--chart-categorical-4').trim(),
-        style.getPropertyValue('--chart-categorical-5').trim(),
-        style.getPropertyValue('--chart-categorical-6').trim(),
-        style.getPropertyValue('--chart-categorical-7').trim(),
-        style.getPropertyValue('--chart-categorical-8').trim()
-      ].filter(color => color && color !== '')
-    };
-  }
+  import { createThemedPlotlyConfig, getCurrentThemeColors } from '../utils/plotlyTheme.ts';
   
-  // Apply theme colors to chart data
-  function applyThemeToChartData(data) {
-    const themeColors = getThemeColors();
-    
-    return data.map((trace, index) => {
-      const updatedTrace = { ...trace };
-      
-      // Apply categorical colors for multiple traces
-      if (data.length > 1 && themeColors.chartColors.length > 0) {
-        const colorIndex = index % themeColors.chartColors.length;
-        if (trace.type === 'bar' || trace.type === 'scatter') {
-          updatedTrace.marker = {
-            ...trace.marker,
-            color: trace.marker?.color || themeColors.chartColors[colorIndex]
-          };
-        } else if (trace.type === 'scatter' && trace.mode?.includes('lines')) {
-          updatedTrace.line = {
-            ...trace.line,
-            color: trace.line?.color || themeColors.chartColors[colorIndex]
-          };
-        }
-      }
-      
-      // For single traces, use accent color
-      if (data.length === 1) {
-        if (trace.type === 'bar' && !trace.marker?.color) {
-          updatedTrace.marker = {
-            ...trace.marker,
-            color: themeColors.accent
-          };
-        } else if (trace.type === 'scatter' && trace.mode?.includes('lines') && !trace.line?.color) {
-          updatedTrace.line = {
-            ...trace.line,
-            color: themeColors.accent
-          };
-        }
-      }
-      
-      return updatedTrace;
-    });
-  }
-
-  // Plotly chart initialization
+  // Plotly chart initialization with comprehensive theming
   function initializePlotlyChart(container) {
     try {
-      let data = JSON.parse(container.dataset.plotlyData);
-      const layout = JSON.parse(container.dataset.plotlyLayout);
-      const config = JSON.parse(container.dataset.plotlyConfig);
+      const rawData = JSON.parse(container.dataset.plotlyData);
+      const customLayout = JSON.parse(container.dataset.plotlyLayout);
+      const customConfig = JSON.parse(container.dataset.plotlyConfig);
       
-      // Apply theme colors to chart data
-      data = applyThemeToChartData(data);
+      // Create fully themed configuration
+      const { data, layout, config } = createThemedPlotlyConfig(rawData, customLayout, customConfig);
       
       // Remove loading skeleton
       const loadingEl = container.querySelector('.chart-loading');
@@ -133,35 +56,45 @@ const defaultLayout = {
         loadingEl.remove();
       }
       
-      // Create the plot
+      // Create the plot with themed configuration
       window.Plotly.newPlot(container, data, layout, config);
       
-      // Handle theme changes (both dark/light and color themes)
+      // Handle theme changes dynamically
       const handleThemeChange = () => {
-        const isDark = document.documentElement.classList.contains('theme-dark');
-        const updatedLayout = {
-          ...layout,
-          font: {
-            ...layout.font,
-            color: isDark ? '#a3acc8' : '#3d4663'
-          }
-        };
-        
-        // Re-apply theme colors to chart data
-        const newData = applyThemeToChartData(JSON.parse(container.dataset.plotlyData));
-        
-        // Update both layout and data
-        window.Plotly.react(container, newData, updatedLayout, config);
+        try {
+          // Re-create themed configuration with current theme
+          const { data: newData, layout: newLayout } = createThemedPlotlyConfig(
+            rawData, 
+            customLayout, 
+            customConfig
+          );
+          
+          // Update the chart with new themed data and layout
+          window.Plotly.react(container, newData, newLayout, config);
+        } catch (error) {
+          console.warn('Failed to update chart theme:', error);
+        }
       };
       
-      // Watch for theme changes
-      const observer = new MutationObserver(handleThemeChange);
+      // Watch for theme changes via DOM class changes
+      const observer = new MutationObserver((mutations) => {
+        const hasThemeChange = mutations.some(mutation => 
+          mutation.type === 'attributes' && 
+          mutation.attributeName === 'class' &&
+          (mutation.target.className.includes('theme-') || mutation.target.className.includes('theme-dark'))
+        );
+        
+        if (hasThemeChange) {
+          handleThemeChange();
+        }
+      });
+      
       observer.observe(document.documentElement, { 
         attributes: true, 
         attributeFilter: ['class'] 
       });
       
-      // Listen for custom theme change events
+      // Listen for custom theme change events (for programmatic theme changes)
       document.addEventListener('theme-changed', handleThemeChange);
       
     } catch (error) {
@@ -170,11 +103,12 @@ const defaultLayout = {
     }
   }
   
-  // Initialize all charts when page loads
-  document.addEventListener('DOMContentLoaded', () => {
+  // Initialize charts when Plotly is loaded and DOM is ready
+  function initializeAllCharts() {
     const charts = document.querySelectorAll('.plotly-chart');
+    
     charts.forEach(chart => {
-      // Use intersection observer for performance
+      // Use intersection observer for performance - only load charts when they're visible
       const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
           if (entry.isIntersecting) {
@@ -183,12 +117,19 @@ const defaultLayout = {
           }
         });
       }, {
-        rootMargin: '50px'
+        rootMargin: '100px' // Start loading slightly before chart comes into view
       });
       
       observer.observe(chart);
     });
-  });
+  }
+  
+  // Wait for both DOM and Plotly to be available
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeAllCharts);
+  } else {
+    initializeAllCharts();
+  }
 </script>
 
 <style>

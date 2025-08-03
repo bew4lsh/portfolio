@@ -1,0 +1,131 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PlotlyChart from '../components/PlotlyChart.astro';
+
+// Sample chart data for testing theme integration
+const sampleBarData = [
+  {
+    x: ['Jan', 'Feb', 'Mar', 'Apr', 'May'],
+    y: [20, 14, 23, 25, 22],
+    type: 'bar',
+    name: 'Revenue'
+  }
+];
+
+const sampleLineData = [
+  {
+    x: [1, 2, 3, 4, 5],
+    y: [10, 11, 12, 13, 14],
+    type: 'scatter',
+    mode: 'lines+markers',
+    name: 'Growth'
+  },
+  {
+    x: [1, 2, 3, 4, 5],
+    y: [16, 15, 14, 13, 12],
+    type: 'scatter',
+    mode: 'lines+markers',
+    name: 'Decline'
+  }
+];
+
+const samplePieData = [
+  {
+    values: [19, 26, 55],
+    labels: ['Residential', 'Commercial', 'Industrial'],
+    type: 'pie'
+  }
+];
+
+const defaultLayout = {
+  title: 'Sample Chart',
+  showlegend: true
+};
+---
+
+<BaseLayout
+  title="Chart Theming Test"
+  description="Testing theme-aware Plotly.js charts"
+>
+  <div class="stack gap-20 lg:gap-48">
+    <div class="wrapper stack gap-8 lg:gap-20">
+      <header class="hero">
+        <div class="stack gap-2">
+          <h1 class="title">Chart Theming Test</h1>
+          <p class="tagline">Testing theme-aware Plotly.js charts across all color themes</p>
+        </div>
+      </header>
+
+      <main class="wrapper">
+        <div class="stack gap-10">
+          <section>
+            <h2>Bar Chart</h2>
+            <PlotlyChart
+              id="test-bar"
+              data={sampleBarData}
+              layout={{ ...defaultLayout, title: 'Monthly Revenue' }}
+              height="400px"
+            />
+          </section>
+
+          <section>
+            <h2>Line Chart (Multiple Series)</h2>
+            <PlotlyChart
+              id="test-line"
+              data={sampleLineData}
+              layout={{ ...defaultLayout, title: 'Trend Analysis' }}
+              height="400px"
+            />
+          </section>
+
+          <section>
+            <h2>Pie Chart</h2>
+            <PlotlyChart
+              id="test-pie"
+              data={samplePieData}
+              layout={{ ...defaultLayout, title: 'Market Segments' }}
+              height="400px"
+            />
+          </section>
+        </div>
+      </main>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .hero {
+    text-align: center;
+    padding: 2rem 0;
+  }
+
+  .title {
+    font-size: var(--text-3xl);
+    color: var(--gray-0);
+  }
+
+  .tagline {
+    font-size: var(--text-lg);
+    color: var(--gray-300);
+  }
+
+  section {
+    margin-bottom: 3rem;
+  }
+
+  section h2 {
+    font-size: var(--text-xl);
+    color: var(--gray-100);
+    margin-bottom: 1rem;
+  }
+</style>
+
+<script>
+  // Load Plotly.js from CDN for testing
+  if (typeof window !== 'undefined' && !window.Plotly) {
+    const script = document.createElement('script');
+    script.src = 'https://cdn.plot.ly/plotly-2.26.0.min.js';
+    script.async = true;
+    document.head.appendChild(script);
+  }
+</script>
