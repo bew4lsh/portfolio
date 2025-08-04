@@ -113,13 +113,13 @@ function generateThemeCSS(theme) {
       --accent-text-over: ${accentTextOver};
       
       /* Theme-aware background gradients */
-      --bg-gradient-subtle: linear-gradient(135deg, ${theme.colors.accent.dark}30, transparent 50%, ${theme.colors.accent.light}20);
-      --bg-gradient-hero: radial-gradient(ellipse 60% 50% at 50% 0%, ${theme.colors.accent.light}25, transparent 60%);
-      --bg-gradient-footer: linear-gradient(180deg, ${theme.colors.accent.dark}20, ${theme.colors.accent.regular}30);
+      --bg-gradient-subtle: none;
+      --bg-gradient-hero: none;
+      --bg-gradient-footer: none;
       
       /* Theme-aware image filters */
-      --img-theme-filter: sepia(0.4) hue-rotate(${getThemeHueRotate(theme)}) saturate(1.2) brightness(1.05) contrast(1.1);
-      --img-theme-filter-subtle: sepia(0.2) hue-rotate(${getThemeHueRotate(theme)}) saturate(1.0) brightness(1.02);
+      --img-theme-filter: none;
+      --img-theme-filter-subtle: none;
       --img-theme-filter-none: none;
       ${grayVars}
       --chart-color-1: ${getChartColor(primary, 0)};

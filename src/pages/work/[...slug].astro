@@ -35,7 +35,12 @@ const chartData = entry.id === 'datacenter-optimization' ? {
       type: 'bar',
       name: 'Number of Servers',
       marker: {
-        color: ['#E63946', '#E63946', '#E63946', '#F77F00', '#F77F00', '#06D6A0', '#06D6A0', '#2E86AB', '#2E86AB', '#2E86AB']
+        color: [
+          'var(--chart-categorical-5)', 'var(--chart-categorical-5)', 'var(--chart-categorical-5)', 
+          'var(--chart-categorical-3)', 'var(--chart-categorical-3)', 
+          'var(--chart-categorical-4)', 'var(--chart-categorical-4)', 
+          'var(--chart-categorical-2)', 'var(--chart-categorical-2)', 'var(--chart-categorical-2)'
+        ]
       }
     }
   ],
@@ -53,7 +58,10 @@ const chartData = entry.id === 'datacenter-optimization' ? {
       type: 'pie',
       hole: 0.4,
       marker: {
-        colors: ['#2E86AB', '#A23B72', '#F77F00', '#06D6A0', '#E63946', '#7209B7']
+        colors: [
+          'var(--chart-categorical-2)', 'var(--chart-categorical-7)', 'var(--chart-categorical-3)', 
+          'var(--chart-categorical-4)', 'var(--chart-categorical-5)', 'var(--chart-categorical-6)'
+        ]
       }
     }
   ],
