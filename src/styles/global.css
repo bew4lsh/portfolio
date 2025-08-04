@@ -171,23 +171,23 @@ h5 {
 }
 
 h1 {
-	font-size: var(--text-5xl);
+	font-size: var(--text-3xl); /* Reduced from 5xl (72px) to 3xl (42px) */
 }
 
 h2 {
-	font-size: var(--text-4xl);
+	font-size: var(--text-2xl); /* Reduced from 4xl (56px) to 2xl (34px) */
 }
 
 h3 {
-	font-size: var(--text-3xl);
+	font-size: var(--text-xl); /* Reduced from 3xl (42px) to xl (26px) */
 }
 
 h4 {
-	font-size: var(--text-2xl);
+	font-size: var(--text-lg); /* Reduced from 2xl (34px) to lg (20px) */
 }
 
 h5 {
-	font-size: var(--text-xl);
+	font-size: var(--text-md); /* Reduced from xl (26px) to md (18px) */
 }
 
 /* Utilities */
