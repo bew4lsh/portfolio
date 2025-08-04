@@ -1,0 +1,321 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const testCode = {
+  python: `# Data analysis with pandas
+import pandas as pd
+import numpy as np
+from datetime import datetime
+
+def analyze_sales_data(filepath: str) -> pd.DataFrame:
+    """
+    Analyze sales data and return insights.
+    
+    Args:
+        filepath: Path to the CSV file
+    
+    Returns:
+        DataFrame with analysis results
+    """
+    # Load and clean data
+    df = pd.read_csv(filepath)
+    df['date'] = pd.to_datetime(df['date'])
+    
+    # Calculate metrics
+    total_sales = df['amount'].sum()
+    avg_order = df['amount'].mean()
+    
+    # Create summary
+    summary = {
+        'total_sales': total_sales,
+        'average_order': avg_order,
+        'num_orders': len(df),
+        'date_range': (df['date'].min(), df['date'].max())
+    }
+    
+    return pd.DataFrame([summary])`,
+
+  sql: `-- Advanced SQL query with window functions
+WITH monthly_sales AS (
+    SELECT 
+        DATE_TRUNC('month', order_date) as month,
+        customer_id,
+        SUM(total_amount) as monthly_total,
+        COUNT(*) as order_count,
+        -- Calculate running total
+        SUM(SUM(total_amount)) OVER (
+            PARTITION BY customer_id 
+            ORDER BY DATE_TRUNC('month', order_date)
+        ) as running_total
+    FROM orders 
+    WHERE order_date >= '2024-01-01'
+    GROUP BY 1, 2
+),
+customer_metrics AS (
+    SELECT 
+        customer_id,
+        AVG(monthly_total) as avg_monthly_spend,
+        MAX(monthly_total) as max_monthly_spend,
+        STDDEV(monthly_total) as spend_variability
+    FROM monthly_sales
+    GROUP BY customer_id
+)
+SELECT 
+    ms.customer_id,
+    ms.month,
+    ms.monthly_total,
+    cm.avg_monthly_spend,
+    -- Calculate percentile ranking
+    PERCENT_RANK() OVER (
+        PARTITION BY ms.month 
+        ORDER BY ms.monthly_total
+    ) as spend_percentile
+FROM monthly_sales ms
+JOIN customer_metrics cm ON ms.customer_id = cm.customer_id
+WHERE cm.avg_monthly_spend > 1000
+ORDER BY ms.month DESC, ms.monthly_total DESC;`,
+
+  javascript: `// Modern JavaScript with async/await and ES6 features
+class DataProcessor {
+    constructor(config = {}) {
+        this.apiKey = config.apiKey;
+        this.baseUrl = config.baseUrl || 'https://api.example.com';
+        this.cache = new Map();
+    }
+
+    /**
+     * Fetch data from API with caching
+     * @param {string} endpoint - API endpoint
+     * @param {Object} params - Query parameters
+     * @returns {Promise<Object>} API response data
+     */
+    async fetchData(endpoint, params = {}) {
+        const cacheKey = \`\${endpoint}-\${JSON.stringify(params)}\`;
+        
+        // Check cache first
+        if (this.cache.has(cacheKey)) {
+            console.log('📦 Cache hit for:', cacheKey);
+            return this.cache.get(cacheKey);
+        }
+
+        try {
+            const url = new URL(endpoint, this.baseUrl);
+            Object.entries(params).forEach(([key, value]) => {
+                url.searchParams.append(key, value);
+            });
+
+            const response = await fetch(url, {
+                headers: {
+                    'Authorization': \`Bearer \${this.apiKey}\`,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error(\`HTTP error! status: \${response.status}\`);
+            }
+
+            const data = await response.json();
+            
+            // Cache the result
+            this.cache.set(cacheKey, data);
+            
+            return data;
+        } catch (error) {
+            console.error('❌ Fetch failed:', error.message);
+            throw error;
+        }
+    }
+
+    // Process data with functional programming
+    transformData(data, transformers = []) {
+        return transformers.reduce((acc, transform) => transform(acc), data);
+    }
+}
+
+// Usage example
+const processor = new DataProcessor({ 
+    apiKey: process.env.API_KEY,
+    baseUrl: 'https://data.myapp.com' 
+});
+
+// Fetch and process sales data
+const salesData = await processor.fetchData('/sales', { 
+    year: 2024, 
+    category: 'electronics' 
+});
+
+const transformedData = processor.transformData(salesData, [
+    data => data.filter(item => item.amount > 100),
+    data => data.map(item => ({ ...item, tax: item.amount * 0.08 })),
+    data => data.sort((a, b) => b.amount - a.amount)
+]);
+
+console.log('🚀 Processed data:', transformedData);`
+};
+---
+
+<BaseLayout
+  title="Syntax Highlighting Theme Test"
+  description="Testing theme-aware syntax highlighting across all color themes"
+>
+  <div class="stack gap-20 lg:gap-48">
+    <div class="wrapper stack gap-8 lg:gap-20">
+      <header class="hero">
+        <div class="stack gap-2">
+          <h1 class="title">Theme-Aware Syntax Highlighting</h1>
+          <p class="tagline">Code blocks that adapt beautifully to all 5 color themes</p>
+        </div>
+      </header>
+
+      <main class="wrapper">
+        <div class="stack gap-10">
+          <section>
+            <h2>Python - Data Analysis</h2>
+            <p>Featuring type hints, docstrings, and pandas operations</p>
+            ```python
+{testCode.python}
+            ```
+          </section>
+
+          <section>
+            <h2>SQL - Advanced Queries</h2>
+            <p>Window functions, CTEs, and complex joins with comments</p>
+            ```sql
+{testCode.sql}
+            ```
+          </section>
+
+          <section>
+            <h2>JavaScript - Modern ES6+</h2>
+            <p>Classes, async/await, template literals, and error handling</p>
+            ```javascript
+{testCode.javascript}
+            ```
+          </section>
+
+          <section>
+            <h2>Inline Code Examples</h2>
+            <p>Here's some inline code: <code>const result = await fetchData()</code> and more text.</p>
+            <p>Another example with <code>SELECT * FROM users WHERE active = true</code> in the middle.</p>
+          </section>
+
+          <section>
+            <h2>Theme Integration Test</h2>
+            <p>🎨 <strong>Switch between the 5 color themes</strong> using the theme selector in the navigation to see how the syntax highlighting adapts:</p>
+            <ul>
+              <li><strong>Default Purple</strong> - Purple accent with balanced categorical colors</li>
+              <li><strong>Ocean Blue</strong> - Blue-tinted syntax with ocean-inspired palette</li>
+              <li><strong>Forest Green</strong> - Green-focused colors with earthy tones</li>
+              <li><strong>Catppuccin Latte</strong> - Light theme with authentic Catppuccin colors</li>
+              <li><strong>Catppuccin Mocha</strong> - Dark theme with warm, cozy colors</li>
+            </ul>
+            
+            <p>Notice how keywords, strings, functions, and other syntax elements change color to match each theme while maintaining excellent readability and contrast.</p>
+          </section>
+
+          <section>
+            <h2>Feature Highlights</h2>
+            <div class="features-grid">
+              <div class="feature">
+                <h3>🎨 Theme Integration</h3>
+                <p>Syntax colors derived from each theme's color palette</p>
+              </div>
+              <div class="feature">
+                <h3>🌙 Light/Dark Modes</h3>
+                <p>Automatic adaptation to light and dark mode preferences</p>
+              </div>
+              <div class="feature">
+                <h3>♿ Accessibility</h3>
+                <p>WCAG-compliant contrast ratios across all themes</p>
+              </div>
+              <div class="feature">
+                <h3>🔄 Smooth Transitions</h3>
+                <p>Beautiful animations when switching between themes</p>
+              </div>
+            </div>
+          </section>
+        </div>
+      </main>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .hero {
+    text-align: center;
+    padding: 2rem 0;
+  }
+
+  .title {
+    font-size: var(--text-3xl);
+    color: var(--gray-0);
+  }
+
+  .tagline {
+    font-size: var(--text-lg);
+    color: var(--gray-300);
+  }
+
+  section {
+    margin-bottom: 3rem;
+  }
+
+  section h2 {
+    font-size: var(--text-xl);
+    color: var(--gray-100);
+    margin-bottom: 0.5rem;
+  }
+
+  section p {
+    color: var(--gray-300);
+    margin-bottom: 1rem;
+  }
+
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+  }
+
+  .feature {
+    background: var(--gray-900);
+    border: 1px solid var(--gray-800);
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+  }
+
+  .feature h3 {
+    font-size: var(--text-lg);
+    color: var(--gray-100);
+    margin-bottom: 0.5rem;
+  }
+
+  .feature p {
+    color: var(--gray-400);
+    margin: 0;
+  }
+
+  code {
+    background: var(--syntax-bg);
+    color: var(--syntax-keyword);
+    padding: 0.2rem 0.4rem;
+    border-radius: 0.25rem;
+    font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', Consolas, monospace;
+    font-size: 0.875em;
+    border: 1px solid var(--syntax-border);
+  }
+
+  ul {
+    color: var(--gray-300);
+  }
+
+  li {
+    margin-bottom: 0.5rem;
+  }
+
+  strong {
+    color: var(--gray-100);
+  }
+</style>

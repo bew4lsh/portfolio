@@ -1,0 +1,177 @@
+/* 
+ * Theme-aware syntax highlighting styles
+ * Integrates Shiki dual themes with our 5-theme color system
+ */
+
+/* Base syntax highlighting container */
+.astro-code {
+  background-color: var(--syntax-bg) !important;
+  border: 1px solid var(--syntax-border);
+  border-radius: 0.75rem;
+  padding: 1rem;
+  margin: 1.5rem 0;
+  overflow-x: auto;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', Consolas, monospace;
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
+
+/* Default theme syntax variables (Portfolio Purple) */
+:root {
+  /* Syntax background and borders */
+  --syntax-bg: var(--gray-900);
+  --syntax-border: var(--gray-800);
+  --syntax-selection: var(--accent-overlay);
+  
+  /* Core syntax token colors */
+  --syntax-plain: var(--gray-200);
+  --syntax-comment: var(--gray-400);
+  --syntax-keyword: var(--accent-regular);
+  --syntax-string: var(--chart-categorical-3);
+  --syntax-function: var(--chart-categorical-1);
+  --syntax-variable: var(--gray-100);
+  --syntax-number: var(--chart-categorical-5);
+  --syntax-operator: var(--gray-300);
+  --syntax-punctuation: var(--gray-300);
+  --syntax-tag: var(--accent-light);
+  --syntax-attribute: var(--chart-categorical-2);
+  --syntax-constant: var(--accent-dark);
+  --syntax-type: var(--chart-categorical-4);
+  --syntax-deleted: var(--chart-categorical-6);
+  --syntax-inserted: var(--chart-categorical-3);
+}
+
+/* Dark mode syntax adjustments */
+:root.theme-dark {
+  --syntax-bg: var(--gray-800);
+  --syntax-border: var(--gray-700);
+  --syntax-plain: var(--gray-300);
+  --syntax-comment: var(--gray-500);
+  --syntax-variable: var(--gray-200);
+  --syntax-operator: var(--gray-400);
+  --syntax-punctuation: var(--gray-400);
+}
+
+/* Theme-specific syntax colors are now generated automatically in themes.css */
+
+/* Override Shiki's CSS variables with our theme-aware ones */
+.astro-code {
+  --shiki-color-text: var(--syntax-plain);
+  --shiki-color-background: var(--syntax-bg);
+  --shiki-token-comment: var(--syntax-comment);
+  --shiki-token-keyword: var(--syntax-keyword);
+  --shiki-token-string: var(--syntax-string);
+  --shiki-token-function: var(--syntax-function);
+  --shiki-token-constant: var(--syntax-constant);
+  --shiki-token-parameter: var(--syntax-variable);
+  --shiki-token-punctuation: var(--syntax-punctuation);
+  --shiki-token-link: var(--accent-regular);
+}
+
+/* Specific token overrides for better theme integration */
+.astro-code .token.comment,
+.astro-code .token.prolog,
+.astro-code .token.doctype,
+.astro-code .token.cdata {
+  color: var(--syntax-comment);
+  font-style: italic;
+}
+
+.astro-code .token.keyword,
+.astro-code .token.important,
+.astro-code .token.atrule {
+  color: var(--syntax-keyword);
+  font-weight: 600;
+}
+
+.astro-code .token.string,
+.astro-code .token.char,
+.astro-code .token.attr-value,
+.astro-code .token.regex {
+  color: var(--syntax-string);
+}
+
+.astro-code .token.function,
+.astro-code .token.class-name {
+  color: var(--syntax-function);
+  font-weight: 500;
+}
+
+.astro-code .token.number,
+.astro-code .token.boolean {
+  color: var(--syntax-number);
+}
+
+.astro-code .token.variable,
+.astro-code .token.parameter {
+  color: var(--syntax-variable);
+}
+
+.astro-code .token.operator,
+.astro-code .token.entity,
+.astro-code .token.url,
+.astro-code .token.symbol {
+  color: var(--syntax-operator);
+}
+
+.astro-code .token.punctuation,
+.astro-code .token.delimiter {
+  color: var(--syntax-punctuation);
+}
+
+.astro-code .token.tag {
+  color: var(--syntax-tag);
+}
+
+.astro-code .token.attr-name {
+  color: var(--syntax-attribute);
+}
+
+.astro-code .token.constant,
+.astro-code .token.builtin {
+  color: var(--syntax-constant);
+}
+
+.astro-code .token.deleted {
+  color: var(--syntax-deleted);
+  background-color: rgba(var(--syntax-deleted), 0.1);
+}
+
+.astro-code .token.inserted {
+  color: var(--syntax-inserted);
+  background-color: rgba(var(--syntax-inserted), 0.1);
+}
+
+/* Line highlighting and selection */
+.astro-code .line.highlighted {
+  background-color: var(--syntax-selection);
+  padding: 0 1rem;
+  margin: 0 -1rem;
+}
+
+.astro-code::selection,
+.astro-code *::selection {
+  background-color: var(--syntax-selection);
+}
+
+/* Responsive adjustments */
+@media (max-width: 50em) {
+  .astro-code {
+    font-size: 0.8rem;
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    margin: 1rem 0;
+  }
+}
+
+/* Focus and accessibility */
+.astro-code:focus-within {
+  outline: 2px solid var(--accent-regular);
+  outline-offset: 2px;
+}
+
+/* Smooth transitions for theme changes */
+.astro-code,
+.astro-code * {
+  transition: color var(--theme-transition), background-color var(--theme-transition), border-color var(--theme-transition);
+}

@@ -53,6 +53,20 @@
       --gradient-stop-1: #8839ef;
       --gradient-stop-2: #d20f39;
       --gradient-stop-3: #fe640b;
+      
+      /* Theme-aware syntax highlighting colors */
+      --syntax-bg: #eff1f5;
+      --syntax-border: #dce0e8;
+      --syntax-plain: #4c4f69;
+      --syntax-comment: #9ca0b0;
+      --syntax-keyword: #d20f39;
+      --syntax-string: #df8e1d;
+      --syntax-function: #d20f39;
+      --syntax-number: #209fb5;
+      --syntax-tag: #fe640b;
+      --syntax-attribute: #fe640b;
+      --syntax-constant: #8839ef;
+      --syntax-type: #40a02b;
     }
   
 /* Catppuccin Mocha theme styles */
@@ -105,6 +119,20 @@
       --gradient-stop-1: #b4befe;
       --gradient-stop-2: #cba6f7;
       --gradient-stop-3: #f9e2af;
+      
+      /* Theme-aware syntax highlighting colors */
+      --syntax-bg: #1e1e2e;
+      --syntax-border: #313244;
+      --syntax-plain: #9399b2;
+      --syntax-comment: #6c7086;
+      --syntax-keyword: #cba6f7;
+      --syntax-string: #fab387;
+      --syntax-function: #cba6f7;
+      --syntax-number: #94e2d5;
+      --syntax-tag: #f9e2af;
+      --syntax-attribute: #f9e2af;
+      --syntax-constant: #b4befe;
+      --syntax-type: #a6e3a1;
     }
   
 /* Portfolio Purple theme styles */
@@ -144,6 +172,20 @@
       --gradient-stop-1: #1c0056;
       --gradient-stop-2: #7611a6;
       --gradient-stop-3: #c561f6;
+      
+      /* Theme-aware syntax highlighting colors */
+      --syntax-bg: #283044;
+      --syntax-border: #3d4663;
+      --syntax-plain: #3d4663;
+      --syntax-comment: #6474a2;
+      --syntax-keyword: #7611a6;
+      --syntax-string: #F77F00;
+      --syntax-function: #7611a6;
+      --syntax-number: #E63946;
+      --syntax-tag: #c561f6;
+      --syntax-attribute: #2E86AB;
+      --syntax-constant: #1c0056;
+      --syntax-type: #06D6A0;
     }
   
 /* Forest Green theme styles */
@@ -196,6 +238,20 @@
       --gradient-stop-1: #1b5e20;
       --gradient-stop-2: #4caf50;
       --gradient-stop-3: #81c784;
+      
+      /* Theme-aware syntax highlighting colors */
+      --syntax-bg: #efebe9;
+      --syntax-border: #d7ccc8;
+      --syntax-plain: #6d4c41;
+      --syntax-comment: #8d6e63;
+      --syntax-keyword: #4caf50;
+      --syntax-string: #ff9800;
+      --syntax-function: #4caf50;
+      --syntax-number: #795548;
+      --syntax-tag: #81c784;
+      --syntax-attribute: #2196f3;
+      --syntax-constant: #1b5e20;
+      --syntax-type: #e91e63;
     }
   
 /* Ocean Blue theme styles */
@@ -248,5 +304,19 @@
       --gradient-stop-1: #0d47a1;
       --gradient-stop-2: #2196f3;
       --gradient-stop-3: #4fc3f7;
+      
+      /* Theme-aware syntax highlighting colors */
+      --syntax-bg: #f5f5f5;
+      --syntax-border: #eceff1;
+      --syntax-plain: #607d8b;
+      --syntax-comment: #90a4ae;
+      --syntax-keyword: #2196f3;
+      --syntax-string: #ff9800;
+      --syntax-function: #2196f3;
+      --syntax-number: #9c27b0;
+      --syntax-tag: #4fc3f7;
+      --syntax-attribute: #4caf50;
+      --syntax-constant: #0d47a1;
+      --syntax-type: #e91e63;
     }
   

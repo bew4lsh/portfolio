@@ -1,3 +1,6 @@
+/* Import theme-aware syntax highlighting */
+@import './syntax-themes.css';
+
 /* Global variables */
 :root {
 	/* Colors */

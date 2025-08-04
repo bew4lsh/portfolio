@@ -9,6 +9,27 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const themesDir = join(__dirname, '../src/content/themes');
 const outputPath = join(__dirname, '../src/styles/themes.css');
 
+// Generate syntax highlighting colors based on theme characteristics
+function generateSyntaxColors(theme) {
+  const { primary, categorical } = theme.colors.charts;
+  const isLightTheme = theme.id === 'catppuccin-latte';
+  
+  return {
+    bg: isLightTheme ? '#eff1f5' : (theme.colors.gray ? theme.colors.gray['800'] || '#283044' : '#283044'),
+    border: isLightTheme ? '#dce0e8' : (theme.colors.gray ? theme.colors.gray['700'] || '#3d4663' : '#3d4663'),
+    plain: isLightTheme ? '#4c4f69' : (theme.colors.gray ? theme.colors.gray['200'] || '#3d4663' : '#3d4663'),
+    comment: isLightTheme ? '#9ca0b0' : (theme.colors.gray ? theme.colors.gray['400'] || '#6474a2' : '#6474a2'),
+    keyword: theme.colors.accent.regular,
+    string: categorical[2] || theme.colors.accent.light,
+    function: categorical[0] || theme.colors.accent.regular,
+    number: categorical[4] || theme.colors.accent.dark,
+    tag: theme.colors.accent.light,
+    attribute: categorical[1] || theme.colors.accent.regular,
+    constant: theme.colors.accent.dark,
+    type: categorical[3] || theme.colors.accent.regular
+  };
+}
+
 // Simple theme CSS generation without full Astro environment
 function generateThemeCSS(theme) {
   // Helper function for safe circular color access with fallback
@@ -79,6 +100,9 @@ function generateThemeCSS(theme) {
     (theme.colors.gray ? theme.colors.gray['0'] || '#000000' : '#000000') :
     (theme.colors.gray ? theme.colors.gray['999'] || '#ffffff' : '#ffffff');
 
+  // Generate syntax highlighting colors based on theme
+  const syntaxColors = generateSyntaxColors(theme);
+
   return `
     :root.theme-${theme.id} {
       --accent-light: ${theme.colors.accent.light};
@@ -116,6 +140,20 @@ function generateThemeCSS(theme) {
       --gradient-stop-1: ${getChartColor(gradient, 0)};
       --gradient-stop-2: ${getChartColor(gradient, 1)};
       --gradient-stop-3: ${getChartColor(gradient, 2)};
+      
+      /* Theme-aware syntax highlighting colors */
+      --syntax-bg: ${syntaxColors.bg};
+      --syntax-border: ${syntaxColors.border};
+      --syntax-plain: ${syntaxColors.plain};
+      --syntax-comment: ${syntaxColors.comment};
+      --syntax-keyword: ${syntaxColors.keyword};
+      --syntax-string: ${syntaxColors.string};
+      --syntax-function: ${syntaxColors.function};
+      --syntax-number: ${syntaxColors.number};
+      --syntax-tag: ${syntaxColors.tag};
+      --syntax-attribute: ${syntaxColors.attribute};
+      --syntax-constant: ${syntaxColors.constant};
+      --syntax-type: ${syntaxColors.type};
     }
   `;
 }
