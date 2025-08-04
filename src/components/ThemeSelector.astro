@@ -172,7 +172,7 @@ const themes = await loadThemes();
     position: absolute;
     top: calc(100% + 0.5rem);
     right: 0;
-    min-width: 280px;
+    min-width: min(280px, calc(100vw - 2rem));
     background: var(--gray-999);
     border: 1px solid var(--gray-800);
     border-radius: 0.75rem;

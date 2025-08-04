@@ -53,4 +53,15 @@ const { href } = Astro.props;
 			font-size: var(--text-xl);
 		}
 	}
+	
+	/* Mobile: Allow button text to wrap if needed */
+	@media (max-width: 30em) {
+		a {
+			white-space: normal;
+			word-wrap: break-word;
+			overflow-wrap: break-word;
+			padding: 0.75rem 1.5rem;
+			min-height: 2.5rem;
+		}
+	}
 </style>

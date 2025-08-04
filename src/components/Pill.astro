@@ -20,7 +20,17 @@ const { size = 'medium', class: className = '' } = Astro.props;
 		background-color: var(--accent-regular);
 		border-radius: 999rem;
 		line-height: 1.35;
+		/* Allow pills to wrap on mobile */
 		white-space: nowrap;
+	}
+	
+	/* Mobile: Allow pill text to wrap if needed */
+	@media (max-width: 50em) {
+		.pill {
+			white-space: normal;
+			word-wrap: break-word;
+			overflow-wrap: break-word;
+		}
 	}
 
 	.pill.medium {

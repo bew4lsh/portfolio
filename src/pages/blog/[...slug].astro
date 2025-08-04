@@ -254,7 +254,9 @@ const imgAlt = entry.data.img_alt || `Cover image for ${title}`;
 	.content :global(table) {
 		display: block;
 		overflow-x: auto;
-		white-space: nowrap;
+		/* Remove white-space: nowrap to allow text wrapping in cells */
+		word-wrap: break-word;
+		overflow-wrap: break-word;
 	}
 
 	@media (min-width: 50em) {
@@ -270,6 +272,10 @@ const imgAlt = entry.data.img_alt || `Cover image for ${title}`;
 		padding: 0.75rem;
 		text-align: left;
 		border-bottom: 1px solid var(--gray-800);
+		/* Ensure table cell content can wrap */
+		word-wrap: break-word;
+		overflow-wrap: break-word;
+		hyphens: auto;
 	}
 
 	.content :global(th) {
@@ -286,20 +292,45 @@ const imgAlt = entry.data.img_alt || `Cover image for ${title}`;
 	@media (max-width: 50em) {
 		.content {
 			padding: 0 1rem;
+			/* Ensure content doesn't overflow on mobile */
+			max-width: calc(100vw - 2rem);
+			overflow-wrap: break-word;
 		}
 		
 		.content :global(pre) {
 			margin: 1rem -1rem;
 			border-radius: 0;
+			/* Ensure code blocks fit on mobile */
+			font-size: 0.8rem;
+			white-space: pre-wrap;
+			word-break: break-all;
 		}
 		
 		.content :global(table) {
 			font-size: 0.875rem;
+			/* Better mobile table handling */
+			min-width: auto;
 		}
 		
+		/* Mobile-friendly table cells */
 		.content :global(th),
 		.content :global(td) {
-			padding: 0.5rem 0.25rem;
+			padding: 0.5rem;
+			font-size: 0.875rem;
+			/* Allow aggressive text breaking in small cells */
+			word-break: break-word;
+			hyphens: auto;
+		}
+		
+		/* Handle long URLs and code in mobile */
+		.content :global(a) {
+			word-break: break-all;
+			overflow-wrap: break-word;
+		}
+		
+		.content :global(code) {
+			word-break: break-all;
+			white-space: pre-wrap;
 		}
 	}
 
