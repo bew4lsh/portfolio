@@ -275,9 +275,16 @@ const themes = await loadThemes();
   /* Mobile adjustments */
   @media (max-width: 50em) {
     .theme-menu {
-      right: -0.5rem;
-      left: -0.5rem;
+      right: 0;
+      left: auto;
       min-width: auto;
+      width: max(280px, calc(100vw - 4rem));
+      max-width: calc(100vw - 2rem);
+      transform-origin: top right;
+    }
+    
+    .theme-selector {
+      position: static;
     }
   }
 </style>
