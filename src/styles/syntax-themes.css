@@ -54,92 +54,71 @@
 
 /* Theme-specific syntax colors are now generated automatically in themes.css */
 
-/* Override Shiki's CSS variables with our theme-aware ones */
-.astro-code {
-  --shiki-color-text: var(--syntax-plain);
-  --shiki-color-background: var(--syntax-bg);
-  --shiki-token-comment: var(--syntax-comment);
-  --shiki-token-keyword: var(--syntax-keyword);
-  --shiki-token-string: var(--syntax-string);
-  --shiki-token-function: var(--syntax-function);
-  --shiki-token-constant: var(--syntax-constant);
-  --shiki-token-parameter: var(--syntax-variable);
-  --shiki-token-punctuation: var(--syntax-punctuation);
-  --shiki-token-link: var(--accent-regular);
-}
+/* Override Shiki's default github-dark colors with our theme-aware colors */
+/* Target specific color values that github-dark theme uses */
 
-/* Specific token overrides for better theme integration */
-.astro-code .token.comment,
-.astro-code .token.prolog,
-.astro-code .token.doctype,
-.astro-code .token.cdata {
-  color: var(--syntax-comment);
+/* Comments - github-dark uses #6A737D */
+.astro-code span[style*="#6A737D"] {
+  color: var(--syntax-comment) !important;
   font-style: italic;
 }
 
-.astro-code .token.keyword,
-.astro-code .token.important,
-.astro-code .token.atrule {
-  color: var(--syntax-keyword);
+/* Keywords - github-dark uses #F97583 */
+.astro-code span[style*="#F97583"] {
+  color: var(--syntax-keyword) !important;
   font-weight: 600;
 }
 
-.astro-code .token.string,
-.astro-code .token.char,
-.astro-code .token.attr-value,
-.astro-code .token.regex {
-  color: var(--syntax-string);
+/* Strings - github-dark uses #9ECBFF */
+.astro-code span[style*="#9ECBFF"] {
+  color: var(--syntax-string) !important;
 }
 
-.astro-code .token.function,
-.astro-code .token.class-name {
-  color: var(--syntax-function);
+/* Numbers - github-dark uses #79B8FF */
+.astro-code span[style*="#79B8FF"] {
+  color: var(--syntax-number) !important;
+}
+
+/* Functions - github-dark uses #B392F0 */
+.astro-code span[style*="#B392F0"] {
+  color: var(--syntax-function) !important;
   font-weight: 500;
 }
 
-.astro-code .token.number,
-.astro-code .token.boolean {
-  color: var(--syntax-number);
+/* Plain text - github-dark uses #E1E4E8 */
+.astro-code span[style*="#E1E4E8"] {
+  color: var(--syntax-plain) !important;
 }
 
-.astro-code .token.variable,
-.astro-code .token.parameter {
-  color: var(--syntax-variable);
+/* Variables/identifiers - github-dark uses #FFAB70 */
+.astro-code span[style*="#FFAB70"] {
+  color: var(--syntax-variable) !important;
 }
 
-.astro-code .token.operator,
-.astro-code .token.entity,
-.astro-code .token.url,
-.astro-code .token.symbol {
-  color: var(--syntax-operator);
+/* Types - github-dark uses #79B8FF (same as numbers, but we can differentiate) */
+.astro-code span[style*="#79B8FF"]:not(:has(+ span[style*="("])) {
+  color: var(--syntax-type) !important;
 }
 
-.astro-code .token.punctuation,
-.astro-code .token.delimiter {
-  color: var(--syntax-punctuation);
+/* Constants - github-dark uses #79B8FF for constants too */
+.astro-code .token.constant span[style*="#79B8FF"] {
+  color: var(--syntax-constant) !important;
 }
 
-.astro-code .token.tag {
-  color: var(--syntax-tag);
+/* Tags - github-dark uses #85E89D */
+.astro-code span[style*="#85E89D"] {
+  color: var(--syntax-tag) !important;
 }
 
-.astro-code .token.attr-name {
-  color: var(--syntax-attribute);
+/* Attributes - github-dark uses #FFAB70 */
+.astro-code span[style*="#FFAB70"] {
+  color: var(--syntax-attribute) !important;
 }
 
-.astro-code .token.constant,
-.astro-code .token.builtin {
-  color: var(--syntax-constant);
-}
-
-.astro-code .token.deleted {
-  color: var(--syntax-deleted);
-  background-color: rgba(var(--syntax-deleted), 0.1);
-}
-
-.astro-code .token.inserted {
-  color: var(--syntax-inserted);
-  background-color: rgba(var(--syntax-inserted), 0.1);
+/* Operators and punctuation - github-dark uses #F97583 for operators */
+.astro-code span[style*="#F97583"]:is(.token.operator, .token.punctuation) {
+  color: var(--syntax-operator) !important;
+  font-weight: normal;
 }
 
 /* Line highlighting and selection */
