@@ -11,6 +11,24 @@ export interface PlotlyThemeColors {
   gridColor: string;
 }
 
+export interface ChartCharacteristics {
+  traceCount: number;
+  totalDataPoints: number;
+  chartTypes: string[];
+  hasColorscale: boolean;
+  hasAnimation: boolean;
+  interactionLevel: 'static' | 'hover' | 'interactive';
+  dataDensity: 'sparse' | 'medium' | 'dense';
+  visualComplexity: 'simple' | 'moderate' | 'complex';
+}
+
+export interface ThemeStrategy {
+  priority: 'primary' | 'secondary' | 'accent';
+  purpose: 'analytical' | 'dashboard' | 'presentation';
+  colorIntensity: 'subtle' | 'normal' | 'vibrant';
+  contrastLevel: 'low' | 'medium' | 'high';
+}
+
 /**
  * Get current theme colors from CSS variables
  */
@@ -71,6 +89,155 @@ function getDefaultThemeColors(): PlotlyThemeColors {
 }
 
 /**
+ * Analyze chart characteristics for intelligent theming
+ */
+export function analyzeChartCharacteristics(data: any[], layout: any = {}): ChartCharacteristics {
+  const traceCount = data.length;
+  const chartTypes = [...new Set(data.map(trace => trace.type || 'scatter'))];
+  
+  // Calculate total data points
+  const totalDataPoints = data.reduce((total, trace) => {
+    if (trace.x && Array.isArray(trace.x)) return total + trace.x.length;
+    if (trace.values && Array.isArray(trace.values)) return total + trace.values.length;
+    if (trace.z && Array.isArray(trace.z)) return total + trace.z.flat().length;
+    return total + 10; // Default estimate
+  }, 0);
+  
+  // Check for colorscales
+  const hasColorscale = data.some(trace => 
+    trace.marker?.colorscale || 
+    trace.colorscale ||
+    (Array.isArray(trace.marker?.color) && trace.marker?.color.length > 1)
+  );
+  
+  // Check for animations
+  const hasAnimation = !!(layout.transition || data.some(trace => trace.animation));
+  
+  // Determine interaction level
+  let interactionLevel: 'static' | 'hover' | 'interactive' = 'static';
+  if (layout.hovermode && layout.hovermode !== 'false') interactionLevel = 'hover';
+  if (data.some(trace => trace.hoverinfo || trace.customdata)) interactionLevel = 'interactive';
+  
+  // Determine data density
+  let dataDensity: 'sparse' | 'medium' | 'dense' = 'medium';
+  if (totalDataPoints < 20) dataDensity = 'sparse';
+  else if (totalDataPoints > 100) dataDensity = 'dense';
+  
+  // Determine visual complexity
+  let visualComplexity: 'simple' | 'moderate' | 'complex' = 'simple';
+  if (traceCount > 1 || hasColorscale) visualComplexity = 'moderate';
+  if (traceCount > 3 || (hasColorscale && hasAnimation) || chartTypes.length > 2) {
+    visualComplexity = 'complex';
+  }
+  
+  return {
+    traceCount,
+    totalDataPoints,
+    chartTypes,
+    hasColorscale,
+    hasAnimation,
+    interactionLevel,
+    dataDensity,
+    visualComplexity
+  };
+}
+
+/**
+ * Determine optimal theming strategy based on chart characteristics
+ */
+export function determineThemeStrategy(
+  characteristics: ChartCharacteristics,
+  options: Partial<ThemeStrategy> = {}
+): ThemeStrategy {
+  // Default strategy
+  let strategy: ThemeStrategy = {
+    priority: 'primary',
+    purpose: 'dashboard',
+    colorIntensity: 'normal',
+    contrastLevel: 'medium'
+  };
+
+  // Adjust based on visual complexity
+  if (characteristics.visualComplexity === 'complex') {
+    strategy.colorIntensity = 'subtle';
+    strategy.contrastLevel = 'high';
+  } else if (characteristics.visualComplexity === 'simple') {
+    strategy.colorIntensity = 'vibrant';
+  }
+
+  // Adjust based on data density
+  if (characteristics.dataDensity === 'dense') {
+    strategy.colorIntensity = 'subtle';
+    strategy.contrastLevel = 'high';
+  } else if (characteristics.dataDensity === 'sparse') {
+    strategy.colorIntensity = 'vibrant';
+  }
+
+  // Adjust based on interaction level
+  if (characteristics.interactionLevel === 'interactive') {
+    strategy.purpose = 'analytical';
+    strategy.contrastLevel = 'high';
+  } else if (characteristics.interactionLevel === 'static') {
+    strategy.purpose = 'presentation';
+  }
+
+  // Apply any user overrides
+  return { ...strategy, ...options };
+}
+
+/**
+ * Generate intelligent color palette based on strategy
+ */
+export function generateIntelligentColorPalette(
+  colors: PlotlyThemeColors,
+  strategy: ThemeStrategy,
+  traceCount: number = 1
+): string[] {
+  const baseColors = strategy.priority === 'accent' 
+    ? [colors.accent, colors.accentLight, colors.accentDark, ...colors.primary]
+    : colors.categorical;
+
+  // Adjust color intensity
+  const adjustedColors = baseColors.map(color => {
+    if (strategy.colorIntensity === 'subtle') {
+      return adjustColorOpacity(color, 0.7);
+    } else if (strategy.colorIntensity === 'vibrant') {
+      return adjustColorSaturation(color, 1.2);
+    }
+    return color;
+  });
+
+  // Ensure we have enough colors for all traces
+  const neededColors = Math.max(traceCount, 5);
+  while (adjustedColors.length < neededColors) {
+    adjustedColors.push(...adjustedColors.slice(0, neededColors - adjustedColors.length));
+  }
+
+  return adjustedColors.slice(0, neededColors);
+}
+
+/**
+ * Adjust color opacity (for subtle theming)
+ */
+function adjustColorOpacity(hexColor: string, opacity: number): string {
+  // Convert hex to rgba with opacity
+  const hex = hexColor.replace('#', '');
+  const r = parseInt(hex.substr(0, 2), 16);
+  const g = parseInt(hex.substr(2, 2), 16);
+  const b = parseInt(hex.substr(4, 2), 16);
+  return `rgba(${r}, ${g}, ${b}, ${opacity})`;
+}
+
+/**
+ * Adjust color saturation (for vibrant theming)
+ */
+function adjustColorSaturation(hexColor: string, factor: number): string {
+  // Simple saturation adjustment - in a real implementation, 
+  // you'd convert to HSL, adjust saturation, and convert back
+  return hexColor; // Placeholder - would need full HSL conversion
+}
+
+/**
  * Create theme-aware Plotly layout
  */
 export function createThemedLayout(customLayout: any = {}): any {
@@ -124,35 +291,63 @@ export function createThemedLayout(customLayout: any = {}): any {
 }
 
 /**
- * Apply theme colors to chart data traces
+ * Apply intelligent theme colors to chart data traces
  */
-export function applyThemeToTraces(data: any[]): any[] {
+export function applyThemeToTraces(
+  data: any[], 
+  layout: any = {}, 
+  themeOptions: Partial<ThemeStrategy> = {}
+): any[] {
   const colors = getCurrentThemeColors();
+  const characteristics = analyzeChartCharacteristics(data, layout);
+  const strategy = determineThemeStrategy(characteristics, themeOptions);
+  const intelligentPalette = generateIntelligentColorPalette(colors, strategy, data.length);
+  
+  console.log('🧠 Intelligent theming analysis:', {
+    characteristics,
+    strategy,
+    palette: intelligentPalette.slice(0, 3) + (intelligentPalette.length > 3 ? '...' : '')
+  });
   
   return data.map((trace, index) => {
     const updatedTrace = { ...trace };
+    const traceColor = intelligentPalette[index % intelligentPalette.length];
     
-    // For multiple traces, use categorical colors
-    if (data.length > 1 && colors.categorical.length > 0) {
-      const colorIndex = index % colors.categorical.length;
-      const traceColor = colors.categorical[colorIndex];
-      
-      // Apply color based on trace type
-      if (trace.type === 'bar') {
+    // Handle different chart types with intelligent coloring
+    if (trace.type === 'bar') {
+      updatedTrace.marker = {
+        ...trace.marker,
+        color: traceColor,
+        opacity: strategy.colorIntensity === 'subtle' ? 0.8 : 1,
+        line: {
+          color: colors.gridColor,
+          width: strategy.contrastLevel === 'high' ? 2 : 1,
+          ...trace.marker?.line
+        }
+      };
+    } 
+    
+    else if (trace.type === 'scatter') {
+      // Handle colorscale-based scatter plots (bubble plots)
+      if (Array.isArray(trace.marker?.color) && trace.marker?.colorscale) {
+        const themeColorscale = createIntelligentColorscale(colors, strategy, trace.marker.colorscale);
         updatedTrace.marker = {
           ...trace.marker,
-          color: trace.marker?.color || traceColor,
+          colorscale: themeColorscale,
           line: {
-            color: colors.gridColor,
-            width: 1,
+            color: colors.backgroundColor,
+            width: strategy.contrastLevel === 'high' ? 2 : 1,
             ...trace.marker?.line
           }
         };
-      } else if (trace.type === 'scatter') {
+      } else {
+        // Regular scatter plots
         if (trace.mode?.includes('markers')) {
           updatedTrace.marker = {
             ...trace.marker,
-            color: trace.marker?.color || traceColor,
+            color: traceColor,
+            opacity: strategy.dataDensity === 'dense' ? 0.7 : 1,
+            size: trace.marker?.size || (strategy.dataDensity === 'dense' ? 4 : 6),
             line: {
               color: colors.backgroundColor,
               width: 1,
@@ -163,36 +358,33 @@ export function applyThemeToTraces(data: any[]): any[] {
         if (trace.mode?.includes('lines')) {
           updatedTrace.line = {
             ...trace.line,
-            color: trace.line?.color || traceColor,
-            width: 2
+            color: traceColor,
+            width: strategy.purpose === 'analytical' ? 3 : 2
           };
         }
-      } else if (trace.type === 'pie') {
-        updatedTrace.marker = {
-          ...trace.marker,
-          colors: trace.marker?.colors || colors.categorical,
-          line: {
-            color: colors.backgroundColor,
-            width: 2,
-            ...trace.marker?.line
-          }
-        };
       }
+    } 
+    
+    else if (trace.type === 'pie') {
+      updatedTrace.marker = {
+        ...trace.marker,
+        colors: intelligentPalette,
+        line: {
+          color: colors.backgroundColor,
+          width: strategy.contrastLevel === 'high' ? 3 : 2,
+          ...trace.marker?.line
+        }
+      };
     }
     
-    // For single traces, use accent color
-    if (data.length === 1) {
-      if (trace.type === 'bar') {
-        updatedTrace.marker = {
-          ...trace.marker,
-          color: trace.marker?.color || colors.accent
-        };
-      } else if (trace.type === 'scatter' && trace.mode?.includes('lines')) {
-        updatedTrace.line = {
-          ...trace.line,
-          color: trace.line?.color || colors.accent
-        };
-      }
+    // Add hover styling based on interaction level
+    if (characteristics.interactionLevel !== 'static') {
+      updatedTrace.hoverlabel = {
+        bgcolor: colors.accent,
+        bordercolor: colors.gridColor,
+        font: { color: colors.backgroundColor },
+        ...updatedTrace.hoverlabel
+      };
     }
     
     return updatedTrace;
@@ -200,22 +392,112 @@ export function applyThemeToTraces(data: any[]): any[] {
 }
 
 /**
- * Create a complete themed Plotly configuration
+ * Create intelligent colorscale based on strategy
+ */
+function createIntelligentColorscale(
+  colors: PlotlyThemeColors, 
+  strategy: ThemeStrategy, 
+  originalColorscale: string
+): number[][] {
+  const baseColorscales = {
+    'RdYlGn': [colors.categorical[4], colors.categorical[2], colors.categorical[0]],
+    'Viridis': [colors.accentDark, colors.accent, colors.accentLight],
+    'Blues': [colors.backgroundColor, colors.categorical[1], colors.accentDark],
+    'Reds': [colors.backgroundColor, colors.categorical[4], colors.categorical[6]],
+    'Greens': [colors.backgroundColor, colors.categorical[3], colors.categorical[0]]
+  };
+  
+  const baseColors = baseColorscales[originalColorscale as keyof typeof baseColorscales] || 
+                    [colors.accentDark, colors.accent, colors.accentLight];
+  
+  // Adjust intensity based on strategy
+  const adjustedColors = baseColors.map(color => {
+    if (strategy.colorIntensity === 'subtle') {
+      return adjustColorOpacity(color, 0.8);
+    } else if (strategy.colorIntensity === 'vibrant') {
+      return color; // Keep full intensity
+    }
+    return color;
+  });
+  
+  // Create colorscale array with proper format
+  return adjustedColors.map((color, index) => [
+    index / (adjustedColors.length - 1), 
+    color
+  ]);
+}
+
+/**
+ * Create a complete themed Plotly configuration with intelligent analysis
  */
 export function createThemedPlotlyConfig(
   data: any[], 
   customLayout: any = {}, 
-  customConfig: any = {}
+  customConfig: any = {},
+  themeOptions: Partial<ThemeStrategy> = {}
 ): { data: any[], layout: any, config: any } {
-  return {
-    data: applyThemeToTraces(data),
-    layout: createThemedLayout(customLayout),
-    config: {
-      responsive: true,
-      displayModeBar: 'hover',
-      modeBarButtonsToRemove: ['pan2d', 'lasso2d', 'select2d'],
-      displaylogo: false,
-      ...customConfig
-    }
+  const characteristics = analyzeChartCharacteristics(data, customLayout);
+  const strategy = determineThemeStrategy(characteristics, themeOptions);
+  
+  // Apply intelligent theming to traces
+  const themedData = applyThemeToTraces(data, customLayout, themeOptions);
+  
+  // Create enhanced layout based on strategy
+  const enhancedLayout = {
+    ...createThemedLayout(customLayout),
+    // Adjust layout based on strategy
+    ...(strategy.purpose === 'analytical' && {
+      showlegend: true,
+      legend: { orientation: 'v', x: 1.02, y: 1 }
+    }),
+    ...(strategy.purpose === 'presentation' && {
+      showlegend: false,
+      margin: { l: 40, r: 40, t: 60, b: 40 }
+    }),
+    ...(characteristics.dataDensity === 'dense' && {
+      hovermode: 'closest'
+    })
   };
+  
+  // Create enhanced config based on characteristics
+  const enhancedConfig = {
+    responsive: true,
+    displayModeBar: characteristics.interactionLevel === 'interactive' ? 'hover' : false,
+    modeBarButtonsToRemove: characteristics.interactionLevel === 'static' 
+      ? ['pan2d', 'lasso2d', 'select2d', 'zoom2d', 'autoScale2d']
+      : ['pan2d', 'lasso2d', 'select2d'],
+    displaylogo: false,
+    scrollZoom: characteristics.dataDensity === 'dense',
+    ...customConfig
+  };
+  
+  return {
+    data: themedData,
+    layout: enhancedLayout,
+    config: enhancedConfig
+  };
+}
+
+/**
+ * Convenience function for different chart purposes
+ */
+export function createAnalyticalChart(data: any[], layout: any = {}, config: any = {}) {
+  return createThemedPlotlyConfig(data, layout, config, { 
+    purpose: 'analytical', 
+    contrastLevel: 'high' 
+  });
+}
+
+export function createDashboardChart(data: any[], layout: any = {}, config: any = {}) {
+  return createThemedPlotlyConfig(data, layout, config, { 
+    purpose: 'dashboard', 
+    colorIntensity: 'normal' 
+  });
+}
+
+export function createPresentationChart(data: any[], layout: any = {}, config: any = {}) {
+  return createThemedPlotlyConfig(data, layout, config, { 
+    purpose: 'presentation', 
+    colorIntensity: 'vibrant' 
+  });
 }

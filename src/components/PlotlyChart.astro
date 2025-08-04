@@ -7,6 +7,8 @@ interface Props {
   height?: string;
   width?: string;
   className?: string;
+  chartPurpose?: 'analytical' | 'dashboard' | 'presentation';
+  priority?: 'primary' | 'secondary' | 'accent';
 }
 
 const { 
@@ -16,7 +18,9 @@ const {
   config = {},
   height = '400px',
   width = '100%',
-  className = ''
+  className = '',
+  chartPurpose = 'dashboard',
+  priority = 'primary'
 } = Astro.props;
 ---
 
@@ -27,6 +31,8 @@ const {
   data-plotly-data={JSON.stringify(data)}
   data-plotly-layout={JSON.stringify(layout)}
   data-plotly-config={JSON.stringify(config)}
+  data-chart-purpose={chartPurpose}
+  data-chart-priority={priority}
 >
   <!-- Loading skeleton -->
   <div class="chart-loading">
@@ -38,306 +44,33 @@ const {
 </div>
 
 <script>
-  // Theme-aware Plotly utilities (inlined for browser compatibility)
-  function getCurrentThemeColors() {
-    if (typeof document === 'undefined') {
-      // Server-side fallback
-      return {
-        accent: '#7611a6',
-        primary: ['#7611a6', '#c561f6', '#1c0056', '#9d4edd', '#5a189a'],
-        categorical: ['#7611a6', '#2E86AB', '#F77F00', '#06D6A0', '#E63946'],
-        textColor: '#3d4663',
-        backgroundColor: '#ffffff',
-        gridColor: '#e3e6ee'
-      };
-    }
-
-    const style = getComputedStyle(document.documentElement);
-    const colors = {
-      accent: style.getPropertyValue('--accent-regular').trim(),
-      accentLight: style.getPropertyValue('--accent-light').trim(),
-      accentDark: style.getPropertyValue('--accent-dark').trim(),
-      primary: [
-        style.getPropertyValue('--chart-color-1').trim(),
-        style.getPropertyValue('--chart-color-2').trim(),
-        style.getPropertyValue('--chart-color-3').trim(),
-        style.getPropertyValue('--chart-color-4').trim(),
-        style.getPropertyValue('--chart-color-5').trim()
-      ].filter(color => color && color !== ''),
-      categorical: [
-        style.getPropertyValue('--chart-categorical-1').trim(),
-        style.getPropertyValue('--chart-categorical-2').trim(),
-        style.getPropertyValue('--chart-categorical-3').trim(),
-        style.getPropertyValue('--chart-categorical-4').trim(),
-        style.getPropertyValue('--chart-categorical-5').trim(),
-        style.getPropertyValue('--chart-categorical-6').trim(),
-        style.getPropertyValue('--chart-categorical-7').trim(),
-        style.getPropertyValue('--chart-categorical-8').trim()
-      ].filter(color => color && color !== ''),
-      textColor: style.getPropertyValue('--gray-200').trim(),
-      backgroundColor: style.getPropertyValue('--gray-999').trim(),
-      gridColor: style.getPropertyValue('--gray-800').trim()
-    };
-    
-    // Debug: Log theme colors to console
-    console.log('🎨 Current theme colors:', {
-      accent: colors.accent,
-      categorical: colors.categorical,
-      textColor: colors.textColor,
-      currentTheme: document.documentElement.className
-    });
-    
-    return colors;
-  }
-
-  // Create theme-aware colorscale for bubble plots and heatmaps
-  function createThemeColorscale(colors, originalColorscale) {
-    // Map common colorscales to theme-aware versions
-    const themeColorscales = {
-      'RdYlGn': [
-        [0, colors.categorical[6] || '#E63946'], // Red equivalent
-        [0.5, colors.categorical[3] || '#F77F00'], // Yellow/Orange equivalent  
-        [1, colors.categorical[0] || colors.accent] // Green/Primary equivalent
-      ],
-      'Viridis': [
-        [0, colors.categorical[4] || '#440154'],
-        [0.25, colors.categorical[3] || '#31688e'],
-        [0.75, colors.categorical[1] || '#35b779'],
-        [1, colors.categorical[2] || '#fde725']
-      ],
-      'Blues': [
-        [0, colors.backgroundColor],
-        [0.5, colors.categorical[1] || colors.accent],
-        [1, colors.accentDark || colors.accent]
-      ],
-      'Reds': [
-        [0, colors.backgroundColor],
-        [0.5, colors.categorical[4] || colors.accent],
-        [1, colors.categorical[6] || colors.accent]
-      ]
-    };
-
-    // Return theme colorscale if we have a mapping, otherwise create a simple gradient
-    return themeColorscales[originalColorscale] || [
-      [0, colors.categorical[4] || colors.accent],
-      [0.5, colors.categorical[1] || colors.accent],
-      [1, colors.categorical[0] || colors.accent]
-    ];
-  }
-
-  function createThemedLayout(customLayout = {}) {
-    const colors = getCurrentThemeColors();
-    
-    return {
-      paper_bgcolor: 'transparent',
-      plot_bgcolor: 'transparent',
-      font: {
-        family: 'Public Sans, system-ui, sans-serif',
-        color: colors.textColor,
-        size: 12
-      },
-      colorway: colors.categorical,
-      margin: { l: 60, r: 40, t: 60, b: 60 },
-      
-      xaxis: {
-        gridcolor: colors.gridColor,
-        linecolor: colors.gridColor,
-        tickcolor: colors.gridColor,
-        tickfont: { color: colors.textColor, size: 11 },
-        titlefont: { color: colors.textColor, size: 13 },
-        ...customLayout.xaxis
-      },
-      yaxis: {
-        gridcolor: colors.gridColor,
-        linecolor: colors.gridColor,
-        tickcolor: colors.gridColor,
-        tickfont: { color: colors.textColor, size: 11 },
-        titlefont: { color: colors.textColor, size: 13 },
-        ...customLayout.yaxis
-      },
-      
-      legend: {
-        font: { color: colors.textColor, size: 11 },
-        bgcolor: 'transparent',
-        bordercolor: colors.gridColor,
-        ...customLayout.legend
-      },
-      
-      title: {
-        font: { color: colors.textColor, size: 16 },
-        ...customLayout.title
-      },
-      
-      ...customLayout
-    };
-  }
-
-  function applyThemeToTraces(data) {
-    const colors = getCurrentThemeColors();
-    
-    console.log('📊 Applying theme to traces:', { 
-      traceCount: data.length, 
-      availableColors: colors.categorical.length,
-      accent: colors.accent
-    });
-    
-    return data.map((trace, index) => {
-      const updatedTrace = { ...trace };
-      
-      console.log(`🔧 Processing trace ${index}:`, { 
-        type: trace.type, 
-        hasExistingColor: !!trace.marker?.color,
-        existingColor: trace.marker?.color,
-        isColorArray: Array.isArray(trace.marker?.color),
-        hasColorscale: !!trace.marker?.colorscale,
-        colorscale: trace.marker?.colorscale,
-        markerStructure: trace.marker
-      });
-      
-      // For multiple traces, use categorical colors
-      if (data.length > 1 && colors.categorical.length > 0) {
-        const colorIndex = index % colors.categorical.length;
-        const traceColor = colors.categorical[colorIndex];
-        
-        console.log(`🎯 Multi-trace ${index}: using color ${traceColor} (index ${colorIndex})`);
-        
-        if (trace.type === 'bar') {
-          updatedTrace.marker = {
-            ...trace.marker,
-            color: traceColor, // Force override existing colors
-            line: {
-              color: colors.gridColor,
-              width: 1,
-              ...trace.marker?.line
-            }
-          };
-        } else if (trace.type === 'scatter') {
-          if (trace.mode?.includes('markers')) {
-            // Handle different marker coloring scenarios
-            if (Array.isArray(trace.marker?.color) && trace.marker?.colorscale) {
-              // Colorscale-based coloring (like bubble plots) - create theme-aware colorscale
-              const themeColorscale = createThemeColorscale(colors, trace.marker.colorscale);
-              updatedTrace.marker = {
-                ...trace.marker,
-                colorscale: themeColorscale,
-                line: {
-                  color: colors.backgroundColor,
-                  width: 1,
-                  ...trace.marker?.line
-                }
-              };
-              console.log(`🎨 Applied theme colorscale for scatter plot:`, themeColorscale);
-            } else {
-              // Regular solid color markers
-              updatedTrace.marker = {
-                ...trace.marker,
-                color: traceColor, // Force override existing colors
-                line: {
-                  color: colors.backgroundColor,
-                  width: 1,
-                  ...trace.marker?.line
-                }
-              };
-            }
-          }
-          if (trace.mode?.includes('lines')) {
-            updatedTrace.line = {
-              ...trace.line,
-              color: traceColor, // Force override existing colors
-              width: 2
-            };
-          }
-        } else if (trace.type === 'pie') {
-          updatedTrace.marker = {
-            ...trace.marker,
-            colors: colors.categorical, // Force override existing colors
-            line: {
-              color: colors.backgroundColor,
-              width: 2,
-              ...trace.marker?.line
-            }
-          };
-        }
-      }
-      
-      // For single traces, use accent color
-      if (data.length === 1) {
-        console.log(`🎯 Single trace: using accent color ${colors.accent}`);
-        
-        if (trace.type === 'bar') {
-          updatedTrace.marker = {
-            ...trace.marker,
-            color: colors.accent // Force override existing colors
-          };
-        } else if (trace.type === 'scatter') {
-          if (trace.mode?.includes('markers')) {
-            // Handle colorscale-based scatter plots (bubble plots)
-            if (Array.isArray(trace.marker?.color) && trace.marker?.colorscale) {
-              console.log(`🎨 Single trace colorscale plot detected, applying theme colorscale`);
-              const themeColorscale = createThemeColorscale(colors, trace.marker.colorscale);
-              updatedTrace.marker = {
-                ...trace.marker,
-                colorscale: themeColorscale,
-                line: {
-                  color: colors.backgroundColor,
-                  width: 1,
-                  ...trace.marker?.line
-                }
-              };
-              console.log(`🎨 Applied theme colorscale:`, themeColorscale);
-            } else {
-              // Regular solid color markers
-              updatedTrace.marker = {
-                ...trace.marker,
-                color: colors.accent
-              };
-            }
-          }
-          if (trace.mode?.includes('lines')) {
-            updatedTrace.line = {
-              ...trace.line,
-              color: colors.accent // Force override existing colors
-            };
-          }
-        } else if (trace.type === 'pie') {
-          updatedTrace.marker = {
-            ...trace.marker,
-            colors: colors.categorical // Force override existing colors
-          };
-        }
-      }
-      
-      console.log(`✅ Updated trace ${index}:`, { 
-        finalColor: updatedTrace.marker?.color || updatedTrace.line?.color || updatedTrace.marker?.colors 
-      });
-      
-      return updatedTrace;
-    });
-  }
-
-  function createThemedPlotlyConfig(data, customLayout = {}, customConfig = {}) {
-    return {
-      data: applyThemeToTraces(data),
-      layout: createThemedLayout(customLayout),
-      config: {
-        responsive: true,
-        displayModeBar: 'hover',
-        modeBarButtonsToRemove: ['pan2d', 'lasso2d', 'select2d'],
-        displaylogo: false,
-        ...customConfig
-      }
-    };
-  }
+  // Import the intelligent theming system
+  import { createThemedPlotlyConfig } from '../utils/plotlyTheme.ts';
   
-  // Plotly chart initialization with comprehensive theming
+  // Plotly chart initialization with intelligent theming
   function initializePlotlyChart(container) {
     try {
       const rawData = JSON.parse(container.dataset.plotlyData);
       const customLayout = JSON.parse(container.dataset.plotlyLayout);
       const customConfig = JSON.parse(container.dataset.plotlyConfig);
+      const chartPurpose = container.dataset.chartPurpose || 'dashboard';
+      const chartPriority = container.dataset.chartPriority || 'primary';
       
-      // Create fully themed configuration
-      const { data, layout, config } = createThemedPlotlyConfig(rawData, customLayout, customConfig);
+      // Create intelligent theme options
+      const themeOptions = {
+        purpose: chartPurpose,
+        priority: chartPriority
+      };
+      
+      console.log('🚀 Initializing intelligent chart:', {
+        chartId: container.id,
+        purpose: chartPurpose,
+        priority: chartPriority,
+        traceCount: rawData.length
+      });
+      
+      // Create fully themed configuration with intelligence
+      const { data, layout, config } = createThemedPlotlyConfig(rawData, customLayout, customConfig, themeOptions);
       
       // Remove loading skeleton
       const loadingEl = container.querySelector('.chart-loading');
@@ -348,14 +81,21 @@ const {
       // Create the plot with themed configuration
       window.Plotly.newPlot(container, data, layout, config);
       
-      // Handle theme changes dynamically
+      // Handle theme changes dynamically with intelligent re-theming
       const handleThemeChange = () => {
         try {
-          // Re-create themed configuration with current theme
+          console.log('🔄 Re-theming chart intelligently:', {
+            chartId: container.id,
+            purpose: chartPurpose,
+            priority: chartPriority
+          });
+          
+          // Re-create themed configuration with current theme and intelligence
           const { data: newData, layout: newLayout } = createThemedPlotlyConfig(
             rawData, 
             customLayout, 
-            customConfig
+            customConfig,
+            themeOptions
           );
           
           // Update the chart with new themed data and layout

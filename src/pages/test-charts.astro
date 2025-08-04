@@ -59,32 +59,59 @@ const defaultLayout = {
       <main class="wrapper">
         <div class="stack gap-10">
           <section>
-            <h2>Bar Chart</h2>
+            <h2>Presentation Chart (Bar)</h2>
+            <p>Vibrant colors for visual impact</p>
             <PlotlyChart
-              id="test-bar"
+              id="test-bar-presentation"
               data={sampleBarData}
               layout={{ ...defaultLayout, title: 'Monthly Revenue' }}
               height="400px"
+              chartPurpose="presentation"
+              priority="accent"
             />
           </section>
 
           <section>
-            <h2>Line Chart (Multiple Series)</h2>
+            <h2>Analytical Chart (Multi-Line)</h2>
+            <p>High contrast with detailed interaction</p>
             <PlotlyChart
-              id="test-line"
+              id="test-line-analytical"
               data={sampleLineData}
-              layout={{ ...defaultLayout, title: 'Trend Analysis' }}
+              layout={{ ...defaultLayout, title: 'Trend Analysis', hovermode: 'x unified' }}
               height="400px"
+              chartPurpose="analytical"
+              priority="primary"
             />
           </section>
 
           <section>
-            <h2>Pie Chart</h2>
+            <h2>Dashboard Chart (Pie)</h2>
+            <p>Balanced colors for dashboard integration</p>
             <PlotlyChart
-              id="test-pie"
+              id="test-pie-dashboard"
               data={samplePieData}
               layout={{ ...defaultLayout, title: 'Market Segments' }}
               height="400px"
+              chartPurpose="dashboard"
+              priority="primary"
+            />
+          </section>
+
+          <section>
+            <h2>Dense Data Example</h2>
+            <p>Subtle colors for data-dense visualization</p>
+            <PlotlyChart
+              id="test-dense"
+              data={[{
+                x: Array.from({length: 50}, (_, i) => i),
+                y: Array.from({length: 50}, () => Math.random() * 100),
+                type: 'scatter',
+                mode: 'markers',
+                name: 'Dense Data'
+              }]}
+              layout={{ ...defaultLayout, title: 'Dense Scatter Plot' }}
+              height="400px"
+              chartPurpose="analytical"
             />
           </section>
         </div>
