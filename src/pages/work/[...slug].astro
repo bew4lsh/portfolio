@@ -203,7 +203,11 @@ const chartData = entry.id === 'datacenter-optimization' ? {
 
 	.tags {
 		display: flex;
+		flex-wrap: wrap;
 		gap: 0.5rem;
+		width: 100%;
+		max-width: 100vw;
+		box-sizing: border-box;
 	}
 
 	.description {
@@ -234,6 +238,9 @@ const chartData = entry.id === 'datacenter-optimization' ? {
 		display: flex;
 		flex-wrap: wrap;
 		gap: 0.5rem;
+		width: 100%;
+		max-width: 100vw;
+		box-sizing: border-box;
 	}
 
 	.links {
@@ -297,6 +304,25 @@ const chartData = entry.id === 'datacenter-optimization' ? {
 		box-shadow: var(--shadow-sm);
 		background: var(--gradient-subtle);
 		border: 1px solid var(--gray-800);
+	}
+	
+	/* Mobile: Additional constraints for pill containers */
+	@media (max-width: 50em) {
+		.tags,
+		.tool-pills {
+			padding-right: 1rem;
+			overflow-x: hidden;
+		}
+		
+		.details {
+			width: calc(100vw - 2rem);
+			max-width: calc(100vw - 2rem);
+			overflow-x: hidden;
+		}
+		
+		.project-meta {
+			max-width: calc(100vw - 2rem);
+		}
 	}
 
 	.content :global(blockquote) {
