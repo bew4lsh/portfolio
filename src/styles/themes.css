@@ -154,6 +154,19 @@
       --img-theme-filter-subtle: none;
       --img-theme-filter-none: none;
       
+      --gray-0: #2d1b69;
+      --gray-50: #3d2577;
+      --gray-100: #4d2f85;
+      --gray-200: #5d3993;
+      --gray-300: #6d43a1;
+      --gray-400: #7d4daf;
+      --gray-500: #8d57bd;
+      --gray-600: #9d61cb;
+      --gray-700: #ad6bd9;
+      --gray-800: #bd75e7;
+      --gray-900: #cd7ff5;
+      --gray-999: #ffffff;
+  
       --chart-color-1: #7611a6;
       --chart-color-2: #c561f6;
       --chart-color-3: #1c0056;
@@ -174,10 +187,10 @@
       --gradient-stop-3: #c561f6;
       
       /* Theme-aware syntax highlighting colors */
-      --syntax-bg: #283044;
-      --syntax-border: #3d4663;
-      --syntax-plain: #3d4663;
-      --syntax-comment: #6474a2;
+      --syntax-bg: #bd75e7;
+      --syntax-border: #ad6bd9;
+      --syntax-plain: #5d3993;
+      --syntax-comment: #7d4daf;
       --syntax-keyword: #7611a6;
       --syntax-string: #F77F00;
       --syntax-function: #7611a6;
