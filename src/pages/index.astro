@@ -42,7 +42,7 @@ const projects = (await getCollection('work'))
 					alt="Lia - Data Analyst"
 					width="480"
 					height="620"
-					src="/assets/portrait.jpg"
+					src={`${import.meta.env.BASE_URL}assets/portrait.jpg`}
 				/>
 			</header>
 
@@ -69,7 +69,7 @@ const projects = (await getCollection('work'))
 				</div>
 
 				<div class="cta">
-					<CallToAction href="/work/">
+					<CallToAction href={`${import.meta.env.BASE_URL}work/`}>
 						View All Projects
 						<Icon icon="arrow-right" size="1.2em" />
 					</CallToAction>

@@ -11,13 +11,13 @@ const { data, id, slug } = Astro.props.project;
 // Ensure required fields exist with fallbacks
 const title = data.title || 'Untitled Project';
 const description = data.description || 'No description available';
-const img = data.img || '/assets/placeholder.jpg';
+const img = data.img || `${import.meta.env.BASE_URL}assets/placeholder.jpg`;
 const imgAlt = data.img_alt || `Screenshot of ${title}`;
 const tools = data.tools || [];
 const featured = data.featured || false;
 ---
 
-<a class="card" href={`/portfolio/work/${id}`}>
+<a class="card" href={`${import.meta.env.BASE_URL}work/${id}`}>
 	<div class="content">
 		<span class="title">{title}</span>
 		<p class="description">{description}</p>
