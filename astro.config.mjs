@@ -6,7 +6,7 @@ import sitemap from '@astrojs/sitemap';
 export default defineConfig({
 	// Configure for GitHub Pages deployment
 	site: 'https://bew4lsh.github.io',
-	base: '/portfolio',
+	base: '/portfolio/',
 	integrations: [sitemap()],
 	markdown: {
 		shikiConfig: {
